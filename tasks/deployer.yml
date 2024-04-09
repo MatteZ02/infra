@@ -1,0 +1,217 @@
+---
+- name: "Deployer - SSH - Generate Keypairs"
+  community.crypto.openssh_keypair:
+    path: "/root/.ssh/keys/{{ path }}"
+    type: rsa
+    comment: "{{ ansible_facts.fqdn }}"
+    owner: root
+    group: root
+    mode: '0600'
+  loop: "{{ paths[ansible_facts.fqdn] }}"
+  loop_control:
+    label: "{{ path }}"
+    loop_var: "path"
+  vars:
+    paths:
+      http://divarinet.northeurope.cloudapp.azure.com:
+        - github-MetroHege-MPP-Frontend
+        - github-metrohege-MPP-Backend
+  tags:
+    - ssh
+
+- name: "Deployer - Certbot - Renew Certificates"
+  command: "certbot renew"
+  register: task
+  changed_when: task.stdout.find("No renewals were attempted.") == -1
+  tags:
+    - certbot
+    - tls
+
+- name: "Deployer - Certbot - Copy Certificates"
+  copy:
+    src: "/etc/letsencrypt/live/mpp/"
+    dest: "/root/certs/mpp/"
+    follow: true
+  register: task
+  tags:
+    - certbot
+    - tls
+
+- name: "Deployer - MariaDB - Pull Image"
+  containers.podman.podman_image:
+    name: docker.io/mariadb
+    tag: latest
+  register: deployerTask101
+  when:
+    - ansible_facts.fqdn == "http://divarinet.northeurope.cloudapp.azure.com"
+
+- name: "Deployer - MariaDB - Run Container"
+  containers.podman.podman_container:
+    name: mariadb
+    image: docker.io/mariadb:latest
+    state: started
+    restart: on
+    network: host
+    volumes:
+      - "/root/mariadb:/var/lib/mysql"
+    restart_policy: always
+    env:
+    # TODO
+      MYSQL_ROOT_PASSWORD: "no password?"
+  register: deployerTask102
+  when:
+    - ansible_facts.fqdn == "http://divarinet.northeurope.cloudapp.azure.com"
+    - (deployerTask101 is defined and deployerTask101.changed) or deployerTask101 is undefined
+  tags:
+    - mariadb
+
+- name: "Deployer - MariaDB - Wait"
+  wait_for:
+    host: "127.0.0.1"
+    port: "3306"
+    delay: 10
+  when:
+    - ansible_facts.fqdn == "http://divarinet.northeurope.cloudapp.azure.com"
+    - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
+  tags:
+    - mariadb
+
+- name: "Deployer - MariaDB - Upgrade"
+  containers.podman.podman_container_exec:
+    container: "mariadb"
+    command: "mariadb-upgrade --host=127.0.0.1 --user=root --password=wE7qVL67xJaaXkfo"
+  register: task
+  ignore_errors: yes
+  changed_when: task.stdout.find("This installation of MariaDB is already upgraded") == -1
+  when:
+    - ansible_facts.fqdn == "http://divarinet.northeurope.cloudapp.azure.com"
+    - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
+  tags:
+    - mariadb
+
+- name: "Deployer - MariaDB - Create Users"
+  mysql_user:
+    login_host: "127.0.0.1"
+    login_user: root
+    login_password: "wE7qVL67xJaaXkfo"
+    ca_cert: "/etc/letsencrypt/live/mpp/chain.pem"
+    check_hostname: no
+    name: "mpp"
+    host: "%"
+    password: "UOzw4ijLaJQI13Ec"
+    priv: "mpp.*:ALL"
+  vars:
+    ansible_python_interpreter: "/opt/ansible/bin/python3"
+  when:
+    - ansible_facts.fqdn == "http://divarinet.northeurope.cloudapp.azure.com"
+    - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
+  tags:
+    - mariadb
+
+- name: "Deployer - MariaDB - Create Database"
+  mysql_db:
+    login_host: "127.0.0.1"
+    login_user: "mpp"
+    login_password: "UOzw4ijLaJQI13Ec"
+    ca_cert: "/etc/letsencrypt/live/mpp/chain.pem"
+    check_hostname: no
+    name: "mpp"
+  vars:
+    ansible_python_interpreter: "/opt/ansible/bin/python3"
+  when:
+    - ansible_facts.fqdn == "http://divarinet.northeurope.cloudapp.azure.com"
+    - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
+  tags:
+    - mariadb
+
+- name: "Deployer - Backend - Git Operations"
+  git:
+    repo: git@github.com:MetroHege/MPP-Frontend.git
+    dest: /root/backend
+    version: master
+  register: deployerTask521
+  when:
+    - ansible_facts.fqdn == "http://divarinet.northeurope.cloudapp.azure.com"
+
+- name: "Deployer - Backend - Build Image"
+  containers.podman.podman_image:
+    name: mpp/backend
+    tag: latest
+    path: /root/backend
+    build:
+      file: Dockerfile
+      format: docker
+      cache: on
+    force: on
+  become: on
+  become_user: root
+  register: deployerTask522
+  when:
+    - ansible_facts.fqdn == "http://divarinet.northeurope.cloudapp.azure.com"
+    - (deployerTask521 is defined and deployerTask521.changed) or deployerTask521 is undefined
+  tags:
+    - backend
+
+- name: "Deployer -Backend - Run Container"
+  containers.podman.podman_container:
+    name: backend
+    image: mpp/backend:latest
+    state: started
+    recreate: on
+    network: host
+    volumes:
+      - "/root/backend/.env:/usr/src/app/.env:ro"
+    restart_policy: always
+    command: "npm start"
+  when:
+    - ansible_facts.fqdn == "http://divarinet.northeurope.cloudapp.azure.com"
+    - deployerTask522 is defined
+    - deployerTask522.changed
+  tags:
+    - backend
+
+- name: "Deployer - Frontend - Git Operations"
+  git:
+    repo: git@github.com:MetroHege/MPP-Frontend.git
+    dest: /root/backend/client
+    version: master
+  register: deployerTask531
+  when:
+    - ansible_facts.fqdn == "http://divarinet.northeurope.cloudapp.azure.com"
+
+- name: "Deployer - Frontend - Build Image"
+  containers.podman.podman_image:
+    name: mpp/frontend
+    tag: latest
+    path: /root/backend/client
+    build:
+      file: Dockerfile
+      format: docker
+      cache: on
+    force: on
+  become: on
+  become_user: root
+  register: deployerTask532
+  when:
+    - ansible_facts.fqdn == "http://divarinet.northeurope.cloudapp.azure.com"
+    - (deployerTask531 is defined and deployerTask531.changed) or deployerTask531 is undefined
+  tags:
+    - frontend
+
+- name: "Deployer - Frontend - Run Container"
+  containers.podman.podman_container:
+    name: frontend
+    image: mpp/frontend:latest
+    state: started
+    recreate: on
+    network: host
+    volumes:
+      - "/root/backend/client/.env:/usr/src/app/.env:ro"
+    restart_policy: always
+    command: "npm start"
+  when:
+    - ansible_facts.fqdn == "http://divarinet.northeurope.cloudapp.azure.com"
+    - deployerTask532 is defined
+    - deployerTask532.changed
+  tags:
+    - frontend

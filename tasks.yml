@@ -1,0 +1,25 @@
+---
+- name: "Tasks"
+  hosts: all
+  module_defaults:
+    ansible.builtin.gather_facts:
+        gather_timeout: 10
+
+  tasks:
+    - name: "Install"
+      import_tasks: tasks/install.yml
+      tags:
+        - install
+        - never
+
+    - name: "Maintenance"
+      import_tasks: tasks/maintenance.yml
+      tags:
+        - maintenance
+        - never
+
+    - name: "Deployer"
+      import_tasks: tasks/deployer.yml
+      tags:
+        - deployer
+        - never
