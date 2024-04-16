@@ -111,28 +111,19 @@
   tags:
     - certbot
 
-- name: "Install - Certbot - Auth Hook"
-  get_url:
-    url: "https://git.waren.io/warengroup/acme-dns-auth/raw/branch/master/acme-dns-auth.py"
-    dest: "/etc/letsencrypt/renewal-hooks/pre/acme-dns-auth.py"
-    mode: '700'
-    force: true
-  tags:
-    - certbot
-
-- name: "Install - Certbot - Create Certificates"
-  command: "certbot certonly --cert-name {{ cert.name }} --manual --preferred-challenges dns-01 --email {{ cert.email }} --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -n --manual-auth-hook /etc/letsencrypt/renewal-hooks/pre/acme-dns-auth.py --debug-challenges --preferred-chain='ISRG Root X1' --key-type rsa -d {{ cert.domains | join(' -d ') }}"
-  register: task
-  changed_when: task.stdout.find("Certificate not yet due for renewal; no action taken.") == -1
-  vars:
-    cert:
-      name: musix
-      email: musixdiscordbot@gmail.com
-      domains:
-        - musix-org.com
-        - "*.musix-org.com"
-  tags:
-    - certbot
+# - name: "Install - Certbot - Create Certificates"
+#   command: "certbot certonly --cert-name {{ cert.name }} --manual --preferred-challenges dns-01 --email {{ cert.email }} --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -n --manual-auth-hook /etc/letsencrypt/renewal-hooks/pre/acme-dns-auth.py --debug-challenges --preferred-chain='ISRG Root X1' --key-type rsa -d {{ cert.domains | join(' -d ') }}"
+#   register: task
+#   changed_when: task.stdout.find("Certificate not yet due for renewal; no action taken.") == -1
+#   vars:
+#     cert:
+#       name: musix
+#       email: musixdiscordbot@gmail.com
+#       domains:
+#         - musix-org.com
+#         - "*.musix-org.com"
+#   tags:
+#     - certbot
 
 - name: "Install - MariaDB - Dependencies / Python Library : pymysql"
   pip:
@@ -156,8 +147,8 @@
     minute: "0"
     job: "/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --accept-host-key --private-key ~/.ssh/id_rsa tasks.yml -t maintenance"
 
-- name: "Install - Schedule - Deployer"
-  cron:
-    name: Deployer
-    minute: "*/5"
-    job: "/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --accept-host-key --private-key ~/.ssh/id_rsa tasks.yml -t deployer"
+# - name: "Install - Schedule - Deployer"
+#   cron:
+#     name: Deployer
+#     minute: "*/5"
+#     job: "/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --accept-host-key --private-key ~/.ssh/id_rsa tasks.yml -t deployer"

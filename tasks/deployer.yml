@@ -14,8 +14,8 @@
   vars:
     paths:
       divarinet.northeurope.cloudapp.azure.com:
-        - github-MetroHege-MPP-Frontend
-        - github-metrohege-MPP-Backend
+        - github-metrohege-mpp-frontend
+        - github-metrohege-mpp-backend
   tags:
     - ssh
 
@@ -27,15 +27,15 @@
     - certbot
     - tls
 
-- name: "Deployer - Certbot - Copy Certificates"
-  copy:
-    src: "/etc/letsencrypt/live/mpp/"
-    dest: "/root/certs/mpp/"
-    follow: true
-  register: task
-  tags:
-    - certbot
-    - tls
+# - name: "Deployer - Certbot - Copy Certificates"
+#   copy:
+#     src: "/etc/letsencrypt/live/mpp/"
+#     dest: "/root/certs/mpp/"
+#     follow: true
+#   register: task
+#   tags:
+#     - certbot
+#     - tls
 
 - name: "Deployer - MariaDB - Pull Image"
   containers.podman.podman_image:
@@ -56,8 +56,7 @@
       - "/root/mariadb:/var/lib/mysql"
     restart_policy: always
     env:
-    # TODO
-      MYSQL_ROOT_PASSWORD: "no password?"
+      MYSQL_ROOT_PASSWORD: "y9ZmTmUKLaRrZ4SA"
   register: deployerTask102
   when:
     - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
@@ -79,7 +78,7 @@
 - name: "Deployer - MariaDB - Upgrade"
   containers.podman.podman_container_exec:
     container: "mariadb"
-    command: "mariadb-upgrade --host=127.0.0.1 --user=root --password=wE7qVL67xJaaXkfo"
+    command: "mariadb-upgrade --host=127.0.0.1 --user=root --password=y9ZmTmUKLaRrZ4SA"
   register: task
   ignore_errors: yes
   changed_when: task.stdout.find("This installation of MariaDB is already upgraded") == -1
@@ -93,12 +92,12 @@
   mysql_user:
     login_host: "127.0.0.1"
     login_user: root
-    login_password: "wE7qVL67xJaaXkfo"
+    login_password: "y9ZmTmUKLaRrZ4SA"
     ca_cert: "/etc/letsencrypt/live/mpp/chain.pem"
     check_hostname: no
     name: "mpp"
     host: "%"
-    password: "UOzw4ijLaJQI13Ec"
+    password: "JRrnk4Gia9gn24y5"
     priv: "mpp.*:ALL"
   vars:
     ansible_python_interpreter: "/opt/ansible/bin/python3"
@@ -112,7 +111,7 @@
   mysql_db:
     login_host: "127.0.0.1"
     login_user: "mpp"
-    login_password: "UOzw4ijLaJQI13Ec"
+    login_password: "JRrnk4Gia9gn24y5"
     ca_cert: "/etc/letsencrypt/live/mpp/chain.pem"
     check_hostname: no
     name: "mpp"
@@ -152,7 +151,7 @@
   tags:
     - backend
 
-- name: "Deployer -Backend - Run Container"
+- name: "Deployer - Backend - Run Container"
   containers.podman.podman_container:
     name: backend
     image: mpp/backend:latest
@@ -173,7 +172,7 @@
 - name: "Deployer - Frontend - Git Operations"
   git:
     repo: git@github.com:MetroHege/MPP-Frontend.git
-    dest: /root/backend/client
+    dest: /root/frontend
     version: master
   register: deployerTask531
   when:
@@ -183,7 +182,7 @@
   containers.podman.podman_image:
     name: mpp/frontend
     tag: latest
-    path: /root/backend/client
+    path: /root/frontend
     build:
       file: Dockerfile
       format: docker
@@ -206,9 +205,9 @@
     recreate: on
     network: host
     volumes:
-      - "/root/backend/client/.env:/usr/src/app/.env:ro"
+      - "/root/frontend/:/usr/src/app/"
     restart_policy: always
-    command: "npm start"
+    command: "npm run build"
   when:
     - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
     - deployerTask532 is defined
