@@ -57,7 +57,9 @@
     command: "mariadb-upgrade --host=127.0.0.1 --user=root --password=y9ZmTmUKLaRrZ4SA"
   register: task
   ignore_errors: yes
-  changed_when: task.stdout.find("This installation of MariaDB is already upgraded") == -1
+  changed_when:
+    - task.stdout is defined
+    - task.stdout.find("This installation of MariaDB is already upgraded") == -1
   when:
     - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
   tags:
