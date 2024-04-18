@@ -154,48 +154,48 @@
     version: main
   register: deployerTask531
 
-- name: "Deployer - Frontend - Build Image"
-  containers.podman.podman_image:
-    name: mpp/frontend
-    tag: latest
-    path: /root/frontend
-    build:
-      file: Dockerfile
-      format: docker
-      cache: on
-    force: on
-  become: on
-  become_user: root
-  register: deployerTask532
-  when:
-    - (deployerTask531 is defined and deployerTask531.changed) or deployerTask531 is undefined
-  tags:
-    - frontend
+# - name: "Deployer - Frontend - Build Image"
+#   containers.podman.podman_image:
+#     name: mpp/frontend
+#     tag: latest
+#     path: /root/frontend
+#     build:
+#       file: Dockerfile
+#       format: docker
+#       cache: on
+#     force: on
+#   become: on
+#   become_user: root
+#   register: deployerTask532
+#   when:
+#     - (deployerTask531 is defined and deployerTask531.changed) or deployerTask531 is undefined
+#   tags:
+#     - frontend
 
-- name: "Deployer - Frontend - Run Container"
-  containers.podman.podman_container:
-    name: frontend
-    image: mpp/frontend:latest
-    state: started
-    recreate: on
-    network: host
-    volumes:
-      - "/root/frontend/dist/:/usr/src/app/dist/"
-      - "/root/frontend/.env:/usr/src/app/.env"
-    restart_policy: always
-    command: "npm run build"
-  when:
-    - deployerTask532 is defined
-    - deployerTask532.changed
-  tags:
-    - frontend
+# - name: "Deployer - Frontend - Run Container"
+#   containers.podman.podman_container:
+#     name: frontend
+#     image: mpp/frontend:latest
+#     state: started
+#     recreate: on
+#     network: host
+#     volumes:
+#       - "/root/frontend/dist/:/usr/src/app/dist/"
+#       - "/root/frontend/.env:/usr/src/app/.env"
+#     restart_policy: always
+#     command: "npm run build"
+#   when:
+#     - deployerTask532 is defined
+#     - deployerTask532.changed
+#   tags:
+#     - frontend
 
-- name: "Deployer - Backend - Git Operations"
-  git:
-    repo: https://github.com/MetroHege/MPP-Backend.git
-    dest: /root/backend
-    version: main
-  register: deployerTask521
+# - name: "Deployer - Backend - Git Operations"
+#   git:
+#     repo: https://github.com/MetroHege/MPP-Backend.git
+#     dest: /root/backend
+#     version: main
+#   register: deployerTask521
 
 - name: "Deployer - Backend - Build Image"
   containers.podman.podman_image:
