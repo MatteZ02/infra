@@ -147,12 +147,12 @@
   tags:
     - nginx
 
-- name: "Deployer - Frontend - Git Operations"
-  git:
-    repo: https://github.com/MetroHege/MPP-Frontend.git
-    dest: /root/frontend
-    version: main
-  register: deployerTask531
+# - name: "Deployer - Frontend - Git Operations"
+#   git:
+#     repo: https://github.com/MetroHege/MPP-Frontend.git
+#     dest: /root/frontend
+#     version: main
+#   register: deployerTask531
 
 # - name: "Deployer - Frontend - Build Image"
 #   containers.podman.podman_image:
@@ -190,12 +190,12 @@
 #   tags:
 #     - frontend
 
-# - name: "Deployer - Backend - Git Operations"
-#   git:
-#     repo: https://github.com/MetroHege/MPP-Backend.git
-#     dest: /root/backend
-#     version: main
-#   register: deployerTask521
+- name: "Deployer - Backend - Git Operations"
+  git:
+    repo: https://github.com/MetroHege/MPP-Backend.git
+    dest: /root/backend
+    version: main
+  register: deployerTask521
 
 - name: "Deployer - Backend - Build Image"
   containers.podman.podman_image:
