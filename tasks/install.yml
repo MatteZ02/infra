@@ -127,6 +127,8 @@
     extra_args: --upgrade
     virtualenv: /opt/ansible
     virtualenv_command: "python3 -m venv"
+  tags:
+    - mariadb
 
 - name: "Install - MariaDB - Dependencies / Package : mariadb-client"
   apt:
@@ -134,6 +136,8 @@
      state: latest
   when:
     - ansible_facts.distribution == "Debian" or ansible_facts.distribution == "Ubuntu" or ansible_facts.distribution == "Linux Mint"
+  tags:
+    - mariadb
 
 - name: "Install - Schedule - Maintenance"
   cron:
@@ -141,9 +145,13 @@
     hour: "*/3"
     minute: "0"
     job: "/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --accept-host-key --private-key ~/.ssh/id_rsa tasks.yml -t maintenance"
+  tags:
+    - cron
 
 - name: "Install - Schedule - Deployer"
   cron:
     name: Deployer
     minute: "*/5"
     job: "/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --accept-host-key --private-key ~/.ssh/id_rsa tasks.yml -t deployer"
+  tags:
+    - cron
