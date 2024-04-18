@@ -119,6 +119,61 @@
   tags:
     - mariadb
 
+- name: "Deployer - Nginx - Configure - Create Folder"
+  file:
+    path: "/root/nginx/"
+    state: directory
+  tags:
+    - nginx
+
+- name: "Deployer - Nginx - Configure - Create Subfolders"
+  file:
+    dest: '/root/nginx/{{ item.path }}'
+    state: directory
+  with_filetree: './files/nginx/'
+  loop_control:
+    label: "{{ item.path }}"
+  when:
+    - item.state == 'directory'
+  tags:
+    - nginx
+
+- name: "Deployer - Nginx - Configure - Generating & Transferring Files"
+  template:
+    src: '{{ item.src }}'
+    dest: '/root/nginx/{{ item.path }}'
+  with_filetree: './files/nginx/'
+  loop_control:
+    label: "{{ item.path }}"
+  when:
+    - item.state == 'file'
+  tags:
+    - nginx
+
+- name: "Deployer - Nginx - Pull Image"
+  containers.podman.podman_image:
+    name: docker.io/nginx
+    tag: latest
+  register: deployerTask3
+
+- name: "Deployer - Nginx - Run Container"
+  containers.podman.podman_container:
+    name: nginx
+    image: docker.io/nginx
+    state: started
+    recreate: on
+    network: host
+    volumes:
+      - "/root/nginx/index.html:/usr/share/nginx/html/index.html:ro"
+      - "/root/nginx/config.conf:/etc/nginx/nginx.conf:ro"
+      - "/root/nginx/conf/:/etc/nginx/conf.d/:ro"
+      - "/root/certs/:/etc/nginx/certs/:ro"
+    restart_policy: always
+  when:
+    - (deployerTask3 is defined and deployerTask3.changed) or deployerTask3 is undefined
+  tags:
+    - nginx
+
 - name: "Deployer - Backend - Git Operations"
   git:
     repo: git@github.com:MetroHege/MPP-Backend.git

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{ ansible_facts.fqdn }}</title>
+        <meta charset="UTF-8">
+        <meta name="robots" content="noindex">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <style>
+            body {
+                background-color: #333333;
+                width: 100vw;
+                height: 100vh;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+            }
+
+            *, *:active, *:focus, *:hover, *:visited, *:link {
+                color: #ffffff;
+                font-family: sans-serif;
+            }
+
+            p {
+                margin-bottom: 0px;
+                margin-top: 0px;
+            }
+
+            .org {
+                font-size: xx-large;
+            }
+
+            .link {
+                margin-top: 10px;
+            }
+
+            .server {
+                margin-top: 50px;
+            }
+
+            .server * {
+                color: #555555;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <p class="org">Musix Org</p>
+            <p class="link"><a href="https://musix-org.com">Visit website</a></p>
+
+            <div class="server">
+                <p class="name">{{ ansible_facts.fqdn }}</p>
+            </div>
+        </div>
+
+    </body>
+</html>
