@@ -142,8 +142,8 @@
     minute: "0"
     job: "/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --accept-host-key --private-key ~/.ssh/id_rsa tasks.yml -t maintenance"
 
-# - name: "Install - Schedule - Deployer"
-#   cron:
-#     name: Deployer
-#     minute: "*/5"
-#     job: "/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --accept-host-key --private-key ~/.ssh/id_rsa tasks.yml -t deployer"
+- name: "Install - Schedule - Deployer"
+  cron:
+    name: Deployer
+    minute: "*/5"
+    job: "/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --accept-host-key --private-key ~/.ssh/id_rsa tasks.yml -t deployer"
