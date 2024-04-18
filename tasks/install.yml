@@ -107,8 +107,17 @@
   tags:
     - certbot
 
+- name: "Install - Certbot - Auth Hook"
+  copy:
+    src: "../files/certbot/nginx.sh"
+    dest: "/etc/letsencrypt/renewal-hooks/pre/nginx.sh"
+    mode: '700'
+    force: true
+  tags:
+    - certbot
+
 - name: "Install - Certbot - Create Certificates"
-  command: "certbot certonly --cert-name {{ cert.name }} --manual --preferred-challenges http-01 --email {{ cert.email }} --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -n --debug-challenges --preferred-chain='ISRG Root X1' --key-type rsa -d {{ cert.domains | join(' -d ') }}"
+  command: "certbot certonly --cert-name {{ cert.name }} --manual --preferred-challenges http-01 --email {{ cert.email }} --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -n --manual-auth-hook /etc/letsencrypt/renewal-hooks/pre/nginx.sh --debug-challenges --preferred-chain='ISRG Root X1' --key-type rsa -d {{ cert.domains | join(' -d ') }}"
   register: task
   changed_when: task.stdout.find("Certificate not yet due for renewal; no action taken.") == -1
   vars:

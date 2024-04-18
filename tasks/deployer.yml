@@ -137,7 +137,7 @@
     recreate: on
     network: host
     volumes:
-      - "/root/nginx/index.html:/usr/share/nginx/html/index.html:ro"
+      - "/root/nginx/html:/usr/share/nginx/html:ro"
       - "/root/nginx/config.conf:/etc/nginx/nginx.conf:ro"
       - "/root/nginx/conf/:/etc/nginx/conf.d/:ro"
       - "/root/certs/:/etc/nginx/certs/:ro"
