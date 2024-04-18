@@ -1,11 +1,11 @@
 ---
 - name: "Deployer - Certbot - Renew Certificates"
- command: "certbot renew"
- register: task
- changed_when: task.stdout.find("No renewals were attempted.") == -1
- tags:
-   - certbot
-   - tls
+  command: "certbot renew"
+  register: task
+  changed_when: task.stdout.find("No renewals were attempted.") == -1
+  tags:
+    - certbot
+    - tls
 
 - name: "Deployer - Certbot - Copy Certificates"
   copy:
