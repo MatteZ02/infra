@@ -93,8 +93,6 @@
     login_host: "127.0.0.1"
     login_user: root
     login_password: "y9ZmTmUKLaRrZ4SA"
-    ca_cert: "/etc/letsencrypt/live/mpp/chain.pem"
-    check_hostname: no
     name: "mpp"
     host: "%"
     password: "JRrnk4Gia9gn24y5"
@@ -112,8 +110,6 @@
     login_host: "127.0.0.1"
     login_user: "mpp"
     login_password: "JRrnk4Gia9gn24y5"
-    ca_cert: "/etc/letsencrypt/live/mpp/chain.pem"
-    check_hostname: no
     name: "mpp"
   vars:
     ansible_python_interpreter: "/opt/ansible/bin/python3"
@@ -125,9 +121,9 @@
 
 - name: "Deployer - Backend - Git Operations"
   git:
-    repo: git@github.com:MetroHege/MPP-Frontend.git
+    repo: git@github.com:MetroHege/MPP-Backend.git
     dest: /root/backend
-    version: master
+    version: main
   register: deployerTask521
   when:
     - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
@@ -159,6 +155,7 @@
     recreate: on
     network: host
     volumes:
+      - "/root/backend/uploads:/usr/src/app/uploads"
       - "/root/backend/.env:/usr/src/app/.env:ro"
     restart_policy: always
     command: "npm start"
@@ -173,7 +170,7 @@
   git:
     repo: git@github.com:MetroHege/MPP-Frontend.git
     dest: /root/frontend
-    version: master
+    version: main
   register: deployerTask531
   when:
     - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
@@ -205,7 +202,8 @@
     recreate: on
     network: host
     volumes:
-      - "/root/frontend/:/usr/src/app/"
+      - "/root/frontend/dist/:/usr/src/app/dist/"
+      - "/root/frontend/.env:/usr/src/app/.env"
     restart_policy: always
     command: "npm run build"
   when:
