@@ -53,7 +53,7 @@
 
 - name: "Deployer - MariaDB - Upgrade"
   containers.podman.podman_container_exec:
-    container: "mariadb"
+    name: "mariadb"
     command: "mariadb-upgrade --host=127.0.0.1 --user=root --password=y9ZmTmUKLaRrZ4SA"
   register: task
   ignore_errors: yes
