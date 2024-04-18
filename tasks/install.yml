@@ -90,7 +90,7 @@
     virtualenv: /opt/ansible
     virtualenv_command: "python3 -m venv"
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
   tags:
     - certbot
 
@@ -107,7 +107,7 @@
     label: "{{ binary }}"
     loop_var: "binary"
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
   tags:
     - certbot
 

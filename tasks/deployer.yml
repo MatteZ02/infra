@@ -13,7 +13,7 @@
     loop_var: "path"
   vars:
     paths:
-      divarinet.northeurope.cloudapp.azure.com:
+      divari.northeurope.cloudapp.azure.com:
         - github-metrohege-mpp-frontend
         - github-metrohege-mpp-backend
   tags:
@@ -43,7 +43,7 @@
     tag: latest
   register: deployerTask101
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
 
 - name: "Deployer - MariaDB - Run Container"
   containers.podman.podman_container:
@@ -59,7 +59,7 @@
       MYSQL_ROOT_PASSWORD: "y9ZmTmUKLaRrZ4SA"
   register: deployerTask102
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
     - (deployerTask101 is defined and deployerTask101.changed) or deployerTask101 is undefined
   tags:
     - mariadb
@@ -70,7 +70,7 @@
     port: "3306"
     delay: 10
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
     - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
   tags:
     - mariadb
@@ -83,7 +83,7 @@
 #   ignore_errors: yes
 #   changed_when: task.stdout.find("This installation of MariaDB is already upgraded") == -1
 #   when:
-#     - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+#     - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
 #     - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
 #   tags:
 #     - mariadb
@@ -102,7 +102,7 @@
   vars:
     ansible_python_interpreter: "/opt/ansible/bin/python3"
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
     - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
   tags:
     - mariadb
@@ -118,7 +118,7 @@
   vars:
     ansible_python_interpreter: "/opt/ansible/bin/python3"
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
     - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
   tags:
     - mariadb
@@ -130,7 +130,7 @@
     version: master
   register: deployerTask521
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
 
 - name: "Deployer - Backend - Build Image"
   containers.podman.podman_image:
@@ -146,7 +146,7 @@
   become_user: root
   register: deployerTask522
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
     - (deployerTask521 is defined and deployerTask521.changed) or deployerTask521 is undefined
   tags:
     - backend
@@ -163,7 +163,7 @@
     restart_policy: always
     command: "npm start"
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
     - deployerTask522 is defined
     - deployerTask522.changed
   tags:
@@ -176,7 +176,7 @@
     version: master
   register: deployerTask531
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
 
 - name: "Deployer - Frontend - Build Image"
   containers.podman.podman_image:
@@ -192,7 +192,7 @@
   become_user: root
   register: deployerTask532
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
     - (deployerTask531 is defined and deployerTask531.changed) or deployerTask531 is undefined
   tags:
     - frontend
@@ -209,7 +209,7 @@
     restart_policy: always
     command: "npm run build"
   when:
-    - ansible_facts.fqdn == "divarinet.northeurope.cloudapp.azure.com"
+    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
     - deployerTask532 is defined
     - deployerTask532.changed
   tags:
