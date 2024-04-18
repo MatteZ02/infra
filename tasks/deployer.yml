@@ -1,31 +1,11 @@
 ---
-- name: "Deployer - SSH - Generate Keypairs"
-  community.crypto.openssh_keypair:
-    path: "/root/.ssh/keys/{{ path }}"
-    type: rsa
-    comment: "{{ ansible_facts.fqdn }}"
-    owner: root
-    group: root
-    mode: '0600'
-  loop: "{{ paths[ansible_facts.fqdn] }}"
-  loop_control:
-    label: "{{ path }}"
-    loop_var: "path"
-  vars:
-    paths:
-      divari.northeurope.cloudapp.azure.com:
-        - github-metrohege-mpp-frontend
-        - github-metrohege-mpp-backend
-  tags:
-    - ssh
-
-- name: "Deployer - Certbot - Renew Certificates"
-  command: "certbot renew"
-  register: task
-  changed_when: task.stdout.find("No renewals were attempted.") == -1
-  tags:
-    - certbot
-    - tls
+#- name: "Deployer - Certbot - Renew Certificates"
+#  command: "certbot renew"
+#  register: task
+#  changed_when: task.stdout.find("No renewals were attempted.") == -1
+#  tags:
+#    - certbot
+#    - tls
 
 # - name: "Deployer - Certbot - Copy Certificates"
 #   copy:
@@ -71,17 +51,17 @@
   tags:
     - mariadb
 
-# - name: "Deployer - MariaDB - Upgrade"
-#   containers.podman.podman_container_exec:
-#     container: "mariadb"
-#     command: "mariadb-upgrade --host=127.0.0.1 --user=root --password=y9ZmTmUKLaRrZ4SA"
-#   register: task
-#   ignore_errors: yes
-#   changed_when: task.stdout.find("This installation of MariaDB is already upgraded") == -1
-#   when:
-#     - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
-#   tags:
-#     - mariadb
+ - name: "Deployer - MariaDB - Upgrade"
+   containers.podman.podman_container_exec:
+     container: "mariadb"
+     command: "mariadb-upgrade --host=127.0.0.1 --user=root --password=y9ZmTmUKLaRrZ4SA"
+   register: task
+   ignore_errors: yes
+   changed_when: task.stdout.find("This installation of MariaDB is already upgraded") == -1
+   when:
+     - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
+   tags:
+     - mariadb
 
 - name: "Deployer - MariaDB - Create Users"
   mysql_user:
@@ -169,7 +149,7 @@
 
 - name: "Deployer - Backend - Git Operations"
   git:
-    repo: git@github.com:MetroHege/MPP-Backend.git
+    repo: https://github.com/MetroHege/MPP-Backend.git
     dest: /root/backend
     version: main
   register: deployerTask521
@@ -212,7 +192,7 @@
 
 - name: "Deployer - Frontend - Git Operations"
   git:
-    repo: git@github.com:MetroHege/MPP-Frontend.git
+    repo: https://github.com/MetroHege/MPP-Frontend.git
     dest: /root/frontend
     version: main
   register: deployerTask531
