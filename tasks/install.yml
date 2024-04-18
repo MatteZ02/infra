@@ -89,8 +89,6 @@
     extra_args: --upgrade
     virtualenv: /opt/ansible
     virtualenv_command: "python3 -m venv"
-  when:
-    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
   tags:
     - certbot
 
@@ -106,8 +104,6 @@
   loop_control:
     label: "{{ binary }}"
     loop_var: "binary"
-  when:
-    - ansible_facts.fqdn == "divari.northeurope.cloudapp.azure.com"
   tags:
     - certbot
 
@@ -117,11 +113,10 @@
 #   changed_when: task.stdout.find("Certificate not yet due for renewal; no action taken.") == -1
 #   vars:
 #     cert:
-#       name: musix
-#       email: musixdiscordbot@gmail.com
+#       name: mpp
+#       email: matias.martikainen@metropolia.fi
 #       domains:
-#         - musix-org.com
-#         - "*.musix-org.com"
+#         - "{{ ansible_facts.fqdn }}"
 #   tags:
 #     - certbot
 
