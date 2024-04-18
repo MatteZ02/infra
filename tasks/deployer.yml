@@ -223,6 +223,7 @@
     recreate: on
     network: host
     volumes:
+      - "/root/frontend/dist/:/usr/src/app/dist/:ro"
       - "/root/backend/uploads:/usr/src/app/uploads"
       - "/root/backend/.env:/usr/src/app/.env:ro"
     restart_policy: always
