@@ -1,21 +1,21 @@
 ---
-#- name: "Deployer - Certbot - Renew Certificates"
-#  command: "certbot renew"
-#  register: task
-#  changed_when: task.stdout.find("No renewals were attempted.") == -1
-#  tags:
-#    - certbot
-#    - tls
+- name: "Deployer - Certbot - Renew Certificates"
+ command: "certbot renew"
+ register: task
+ changed_when: task.stdout.find("No renewals were attempted.") == -1
+ tags:
+   - certbot
+   - tls
 
-# - name: "Deployer - Certbot - Copy Certificates"
-#   copy:
-#     src: "/etc/letsencrypt/live/mpp/"
-#     dest: "/root/certs/mpp/"
-#     follow: true
-#   register: task
-#   tags:
-#     - certbot
-#     - tls
+- name: "Deployer - Certbot - Copy Certificates"
+  copy:
+    src: "/etc/letsencrypt/live/mpp/"
+    dest: "/root/certs/mpp/"
+    follow: true
+  register: task
+  tags:
+    - certbot
+    - tls
 
 - name: "Deployer - MariaDB - Pull Image"
   containers.podman.podman_image:
