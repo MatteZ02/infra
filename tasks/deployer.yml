@@ -185,7 +185,7 @@
       - "/root/frontend/dist/:/usr/src/app/dist/"
       - "/root/frontend/.env:/usr/src/app/.env"
     restart_policy: always
-    command: "npm run build"
+    command: "npm start"
   when:
     - deployerTask532 is defined
     - deployerTask532.changed
