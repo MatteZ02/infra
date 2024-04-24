@@ -164,7 +164,7 @@
     build:
       file: Dockerfile
       format: docker
-      cache: on
+      cache: off
     force: on
   become: on
   become_user: root
