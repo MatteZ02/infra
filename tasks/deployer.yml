@@ -21,6 +21,7 @@
   containers.podman.podman_image:
     name: docker.io/mariadb
     tag: latest
+    force: on
   register: deployerTask101
 
 - name: "Deployer - MariaDB - Run Container"
@@ -53,7 +54,7 @@
 
 - name: "Deployer - MariaDB - Upgrade"
   containers.podman.podman_container_exec:
-    name: "mariadb"
+    name: mariadb
     command: "mariadb-upgrade --host=127.0.0.1 --user=root --password=y9ZmTmUKLaRrZ4SA"
   register: task
   ignore_errors: yes
@@ -129,6 +130,7 @@
   containers.podman.podman_image:
     name: docker.io/nginx
     tag: latest
+    force: on
   register: deployerTask3
 
 - name: "Deployer - Nginx - Run Container"
