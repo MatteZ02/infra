@@ -185,7 +185,6 @@
     network: host
     volumes:
       - "/root/frontend/.env:/usr/src/app/.env"
-      - "/root/frontend/icon:/usr/src/app/icon"
     restart_policy: always
     command: "npm start"
   when:
