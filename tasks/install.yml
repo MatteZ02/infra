@@ -12,7 +12,7 @@
 - name: "Install - Ansible - Create Symbolic Links"
   ansible.builtin.file:
     src: /opt/ansible/bin/{{ binary }}
-    dest: /usr/local/bin/{{ binary }}
+    dest: /usr/bin/{{ binary }}
     state: link
   vars:
     binaries:
@@ -95,7 +95,7 @@
 - name: "Install - Certbot - Create Symbolic Links"
   ansible.builtin.file:
     src: /opt/ansible/bin/{{ binary }}
-    dest: /usr/local/bin/{{ binary }}
+    dest: /usr/bin/{{ binary }}
     state: link
   vars:
     binaries:
