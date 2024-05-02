@@ -168,8 +168,6 @@
       format: docker
       cache: off
     force: on
-  become: on
-  become_user: root
   register: deployerTask532
   when:
     - (deployerTask531 is defined and deployerTask531.changed) or deployerTask531 is undefined
@@ -210,8 +208,6 @@
       format: docker
       cache: off
     force: on
-  become: on
-  become_user: root
   register: deployerTask522
   when:
     - (deployerTask521 is defined and deployerTask521.changed) or deployerTask521 is undefined
