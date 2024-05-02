@@ -82,6 +82,18 @@
   tags:
     - podman
 
+- name: "Install : Podman : Configure - Subordinate Ids : Users : root"
+  lineinfile:
+    path: /etc/subuid
+    regexp: "^root"
+    line: "root:100000:65536"
+
+- name: "Installer : Podman : Configure - Subordinate Ids : Groups : root"
+  lineinfile:
+    path: /etc/subgid
+    regexp: "^root"
+    line: "root:100000:65536"
+
 - name: "Install - Certbot - Python Library"
   pip:
     name: certbot
