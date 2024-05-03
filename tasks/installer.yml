@@ -1,5 +1,5 @@
 ---
-- name: "Install - Ansible - Python Library"
+- name: "Installer - Ansible - Python Library"
   pip:
     name: ansible
     state: latest
@@ -9,7 +9,7 @@
   tags:
     - ansible
 
-- name: "Install - Ansible - Create Symbolic Links"
+- name: "Installer - Ansible - Create Symbolic Links"
   ansible.builtin.file:
     src: /opt/ansible/bin/{{ binary }}
     dest: /usr/bin/{{ binary }}
@@ -35,7 +35,7 @@
   tags:
     - ansible
 
-- name: "Install - Ansible - Dependencies / Python Library : hvac"
+- name: "Installer - Ansible - Dependencies / Python Library : hvac"
   pip:
     name: hvac
     state: latest
@@ -45,7 +45,7 @@
   tags:
     - ansible
 
-- name: "Install - Ansible - Dependencies / Python Library : netaddr"
+- name: "Installer - Ansible - Dependencies / Python Library : netaddr"
   pip:
     name: netaddr
     state: latest
@@ -55,7 +55,7 @@
   tags:
     - ansible
 
-- name: "Install - Ansible - Dependencies / Python Library : jmespath"
+- name: "Installer - Ansible - Dependencies / Python Library : jmespath"
   pip:
     name: jmespath
     state: latest
@@ -65,7 +65,7 @@
   tags:
     - ansible
 
-- name: "Install - Ansible - Dependencies / Python Library : pexpect"
+- name: "Installer - Ansible - Dependencies / Python Library : pexpect"
   pip:
    name: pexpect
    state: latest
@@ -75,14 +75,14 @@
   tags:
     - ansible
 
-- name: "Install - Podman"
+- name: "Installer - Podman"
   apt:
      name: podman
      state: latest
   tags:
     - podman
 
-- name: "Install : Podman : Configure - Subordinate Ids : Users : root"
+- name: "Installer : Podman : Configure - Subordinate Ids : Users : root"
   lineinfile:
     path: /etc/subuid
     regexp: "^root"
@@ -94,7 +94,7 @@
     regexp: "^root"
     line: "root:100000:65536"
 
-- name: "Install - Certbot - Python Library"
+- name: "Installer - Certbot - Python Library"
   pip:
     name: certbot
     state: latest
@@ -104,7 +104,7 @@
   tags:
     - certbot
 
-- name: "Install - Certbot - Create Symbolic Links"
+- name: "Installer - Certbot - Create Symbolic Links"
   ansible.builtin.file:
     src: /opt/ansible/bin/{{ binary }}
     dest: /usr/bin/{{ binary }}
@@ -119,7 +119,7 @@
   tags:
     - certbot
 
-- name: "Install - Certbot - Auth Hook"
+- name: "Installer - Certbot - Auth Hook"
   copy:
     src: "../files/certbot/nginx.sh"
     dest: "/etc/letsencrypt/renewal-hooks/pre/nginx.sh"
@@ -128,7 +128,7 @@
   tags:
     - certbot
 
-- name: "Install - Certbot - Create Certificates"
+- name: "Installer - Certbot - Create Certificates"
   command: "certbot certonly --cert-name {{ cert.name }} --manual --preferred-challenges http-01 --email {{ cert.email }} --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -n --manual-auth-hook /etc/letsencrypt/renewal-hooks/pre/nginx.sh --debug-challenges --preferred-chain='ISRG Root X1' --key-type rsa -d {{ cert.domains | join(' -d ') }}"
   register: task
   changed_when: task.stdout.find("Certificate not yet due for renewal; no action taken.") == -1
@@ -141,7 +141,7 @@
   tags:
     - certbot
 
-- name: "Install - MariaDB - Dependencies / Python Library : pymysql"
+- name: "Installer - MariaDB - Dependencies / Python Library : pymysql"
   pip:
     name: pymysql
     state: latest
@@ -151,7 +151,7 @@
   tags:
     - mariadb
 
-- name: "Install - MariaDB - Dependencies / Package : mariadb-client"
+- name: "Installer - MariaDB - Dependencies / Package : mariadb-client"
   apt:
      name: "mariadb-client"
      state: latest
@@ -160,7 +160,7 @@
   tags:
     - mariadb
 
-- name: "Install - Schedule - Maintenance"
+- name: "Installer - Schedule - Maintenance"
   cron:
     name: Maintenance
     hour: "*/3"
@@ -169,7 +169,7 @@
   tags:
     - cron
 
-- name: "Install - Schedule - Deployer"
+- name: "Installer - Schedule - Deployer"
   cron:
     name: Deployer
     minute: "*/5"

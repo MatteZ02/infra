@@ -31,7 +31,7 @@ python3 -m venv /opt/ansible &> /dev/null
 
 /opt/ansible/bin/ansible-galaxy collection install -r requirements.yml --upgrade &> /dev/null
 
-/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --private-key ~/.ssh/id_rsa tasks.yml -t install
+/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --private-key ~/.ssh/id_rsa tasks.yml -t installer
 
 
 echo "

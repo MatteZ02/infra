@@ -6,10 +6,10 @@
         gather_timeout: 10
 
   tasks:
-    - name: "Install"
-      import_tasks: tasks/install.yml
+    - name: "Installer"
+      import_tasks: tasks/installer.yml
       tags:
-        - install
+        - installer
         - never
 
     - name: "Maintenance"
