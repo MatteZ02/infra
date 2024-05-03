@@ -160,6 +160,12 @@
   tags:
     - mariadb
 
+- name: "Installer - Schedule - Setup"
+  cron:
+    name: PATH
+    env: yes
+    value: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
 - name: "Installer - Schedule - Maintenance"
   cron:
     name: Maintenance
