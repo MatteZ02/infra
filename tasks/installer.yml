@@ -100,7 +100,7 @@
     state: directory
   vars:
     paths:
-      - /root/certs
+      - /root/certs/mkj
       - /etc/letsencrypt/renewal-hooks/pre
   loop: "{{ paths }}"
   loop_control:
@@ -133,6 +133,26 @@
     loop_var: "binary"
   tags:
     - certbot
+
+- name: "Installer - Certbot - Self-Signed Certificates - Generate Private Key"
+  community.crypto.openssl_privatekey:
+    path: "/root/certs/mkj/privatekey.pem"
+    type: RSA
+    size: 2048
+    regenerate: never
+
+- name: "Installer - Certbot - Self-Signed Certificates - Create Certificate Signing Request"
+  community.crypto.openssl_csr:
+    common_name: "{{ ansible_facts.fqdn }}"
+    privatekey_path: "/root/certs/mkj/privatekey.pem"
+    path: "/root/certs/mkj/csr.pem"
+
+- name: "Installer - Certbot - Self-Signed Certificates - Generate Certificate"
+  community.crypto.x509_certificate:
+    path: "/root/certs/mkj/fullchain.pem"
+    privatekey_path: "/root/certs/mkj/privatekey.pem"
+    csr_path: "/root/certs/mkj/csr.pem"
+    provider: selfsigned
 
 - name: "Installer - Certbot - Auth Hook"
   copy:
