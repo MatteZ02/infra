@@ -140,12 +140,16 @@
     type: RSA
     size: 2048
     regenerate: never
+  tags:
+    - certbot
 
 - name: "Installer - Certbot - Self-Signed Certificates - Create Certificate Signing Request"
   community.crypto.openssl_csr:
     common_name: "{{ ansible_facts.fqdn }}"
     privatekey_path: "/root/certs/mpp/privkey.pem"
     path: "/root/certs/mpp/csr.pem"
+  tags:
+    - certbot
 
 - name: "Installer - Certbot - Self-Signed Certificates - Generate Certificate"
   community.crypto.x509_certificate:
@@ -153,6 +157,16 @@
     privatekey_path: "/root/certs/mpp/privkey.pem"
     csr_path: "/root/certs/mpp/csr.pem"
     provider: selfsigned
+  tags:
+    - certbot
+
+- name: "Installer - Certbot - Self-Signed Certificates - Copy Certificate"
+  copy:
+    src: "/root/certs/mpp/fullchain.pem"
+    dest: "/root/certs/mpp/chain.pem"
+    force: true
+  tags:
+    - certbot
 
 - name: "Installer - Certbot - Auth Hook"
   copy:
