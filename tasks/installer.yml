@@ -94,6 +94,21 @@
     regexp: "^root"
     line: "root:100000:65536"
 
+- name: "Installer - Certbot - Create Folder"
+  file:
+    path: "{{ path }}"
+    state: directory
+  vars:
+    paths:
+      - /root/certs
+      - /etc/letsencrypt/renewal-hooks/pre
+  loop: "{{ paths }}"
+  loop_control:
+    label: "{{ path }}"
+    loop_var: "path"
+  tags:
+    - certbot
+
 - name: "Installer - Certbot - Python Library"
   pip:
     name: certbot
@@ -116,13 +131,6 @@
   loop_control:
     label: "{{ binary }}"
     loop_var: "binary"
-  tags:
-    - certbot
-
-- name: "Installer - Certbot - Create Folder"
-  file:
-    path: "/etc/letsencrypt/renewal-hooks/pre"
-    state: directory
   tags:
     - certbot
 
