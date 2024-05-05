@@ -142,7 +142,7 @@
   vars:
     cert:
       name: mpp
-      email: matias.martikainen@metropolia.fi
+      email: "{{ secrets.certbot.email }}"
       domains:
         - "{{ ansible_facts.fqdn }}"
   tags:
