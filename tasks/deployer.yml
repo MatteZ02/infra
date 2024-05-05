@@ -35,7 +35,7 @@
       - "/root/mariadb:/var/lib/mysql"
     restart_policy: always
     env:
-      MYSQL_ROOT_PASSWORD: "{{ secrets.mariadb.root.password }}"
+      MYSQL_ROOT_PASSWORD: "{{ secrets.mariadb.users.root.password }}"
   register: deployerTask102
   when:
     - (deployerTask101 is defined and deployerTask101.changed) or deployerTask101 is undefined
@@ -55,7 +55,7 @@
 - name: "Deployer - MariaDB - Upgrade"
   containers.podman.podman_container_exec:
     name: mariadb
-    command: "mariadb-upgrade --host=127.0.0.1 --user=root --password={{ secrets.mariadb.root.password }}"
+    command: "mariadb-upgrade --host=127.0.0.1 --user=root --password={{ secrets.mariadb.users.root.password }}"
   register: task
   ignore_errors: yes
   changed_when:
@@ -70,10 +70,10 @@
   mysql_user:
     login_host: "127.0.0.1"
     login_user: root
-    login_password: "{{ secrets.mariadb.root.password }}"
+    login_password: "{{ secrets.mariadb.users.root.password }}"
     name: "mkj"
     host: "%"
-    password: "{{ secrets.mariadb.mkj.password }}"
+    password: "{{ secrets.mariadb.users.mkj.password }}"
     priv: "mkj.*:ALL"
   vars:
     ansible_python_interpreter: "/opt/ansible/bin/python3"
@@ -86,7 +86,7 @@
   mysql_db:
     login_host: "127.0.0.1"
     login_user: "mkj"
-    login_password: "{{ secrets.mariadb.mkj.password }}"
+    login_password: "{{ secrets.mariadb.users.mkj.password }}"
     name: "mkj"
   vars:
     ansible_python_interpreter: "/opt/ansible/bin/python3"
