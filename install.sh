@@ -43,7 +43,7 @@ fi
 
 ssh-keyscan github.com 1> ~/.ssh/known_hosts 2> /dev/null
 
-/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --accept-host-key --private-key ~/.ssh/id_rsa --vault-password-file ~/.ansible/vault.yml tasks.yml -t installer
+/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-infra --accept-host-key --private-key ~/.ssh/id_rsa --vault-password-file ~/.ansible/vault.yml tasks.yml -t installer
 
 echo "
 ==============================
