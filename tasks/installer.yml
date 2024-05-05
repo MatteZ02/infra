@@ -1,0 +1,184 @@
+---
+- name: "Installer - Ansible - Python Library"
+  pip:
+    name: ansible
+    state: latest
+    extra_args: --upgrade
+    virtualenv: /opt/ansible
+    virtualenv_command: "python3 -m venv"
+  tags:
+    - ansible
+
+- name: "Installer - Ansible - Create Symbolic Links"
+  ansible.builtin.file:
+    src: /opt/ansible/bin/{{ binary }}
+    dest: /usr/bin/{{ binary }}
+    state: link
+  vars:
+    binaries:
+      - ansible
+      - ansible-community
+      - ansible-config
+      - ansible-connection
+      - ansible-console
+      - ansible-doc
+      - ansible-galaxy
+      - ansible-inventory
+      - ansible-playbook
+      - ansible-pull
+      - ansible-test
+      - ansible-vault
+  loop: "{{ binaries }}"
+  loop_control:
+    label: "{{ binary }}"
+    loop_var: "binary"
+  tags:
+    - ansible
+
+- name: "Installer - Ansible - Dependencies / Python Library : hvac"
+  pip:
+    name: hvac
+    state: latest
+    extra_args: --upgrade
+    virtualenv: /opt/ansible
+    virtualenv_command: "python3 -m venv"
+  tags:
+    - ansible
+
+- name: "Installer - Ansible - Dependencies / Python Library : netaddr"
+  pip:
+    name: netaddr
+    state: latest
+    extra_args: --upgrade
+    virtualenv: /opt/ansible
+    virtualenv_command: "python3 -m venv"
+  tags:
+    - ansible
+
+- name: "Installer - Ansible - Dependencies / Python Library : jmespath"
+  pip:
+    name: jmespath
+    state: latest
+    extra_args: --upgrade
+    virtualenv: /opt/ansible
+    virtualenv_command: "python3 -m venv"
+  tags:
+    - ansible
+
+- name: "Installer - Ansible - Dependencies / Python Library : pexpect"
+  pip:
+   name: pexpect
+   state: latest
+   extra_args: --upgrade
+   virtualenv: /opt/ansible
+   virtualenv_command: "python3 -m venv"
+  tags:
+    - ansible
+
+- name: "Installer - Podman"
+  apt:
+     name: podman
+     state: latest
+  tags:
+    - podman
+
+- name: "Installer : Podman : Configure - Subordinate Ids : Users : root"
+  lineinfile:
+    path: /etc/subuid
+    regexp: "^root"
+    line: "root:100000:65536"
+
+- name: "Installer : Podman : Configure - Subordinate Ids : Groups : root"
+  lineinfile:
+    path: /etc/subgid
+    regexp: "^root"
+    line: "root:100000:65536"
+
+- name: "Installer - Certbot - Python Library"
+  pip:
+    name: certbot
+    state: latest
+    extra_args: --upgrade
+    virtualenv: /opt/ansible
+    virtualenv_command: "python3 -m venv"
+  tags:
+    - certbot
+
+- name: "Installer - Certbot - Create Symbolic Links"
+  ansible.builtin.file:
+    src: /opt/ansible/bin/{{ binary }}
+    dest: /usr/bin/{{ binary }}
+    state: link
+  vars:
+    binaries:
+      - certbot
+  loop: "{{ binaries }}"
+  loop_control:
+    label: "{{ binary }}"
+    loop_var: "binary"
+  tags:
+    - certbot
+
+- name: "Installer - Certbot - Auth Hook"
+  copy:
+    src: "../files/certbot/nginx.sh"
+    dest: "/etc/letsencrypt/renewal-hooks/pre/nginx.sh"
+    mode: '700'
+    force: true
+  tags:
+    - certbot
+
+- name: "Installer - Certbot - Create Certificates"
+  command: "certbot certonly --cert-name {{ cert.name }} --manual --preferred-challenges http-01 --email {{ cert.email }} --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -n --manual-auth-hook /etc/letsencrypt/renewal-hooks/pre/nginx.sh --debug-challenges --preferred-chain='ISRG Root X1' --key-type rsa -d {{ cert.domains | join(' -d ') }}"
+  register: task
+  changed_when: task.stdout.find("Certificate not yet due for renewal; no action taken.") == -1
+  vars:
+    cert:
+      name: mkj
+      email: "{{ config.certbot.email }}"
+      domains:
+        - "{{ ansible_facts.fqdn }}"
+  tags:
+    - certbot
+
+- name: "Installer - MariaDB - Dependencies / Python Library : pymysql"
+  pip:
+    name: pymysql
+    state: latest
+    extra_args: --upgrade
+    virtualenv: /opt/ansible
+    virtualenv_command: "python3 -m venv"
+  tags:
+    - mariadb
+
+- name: "Installer - MariaDB - Dependencies / Package : mariadb-client"
+  apt:
+     name: "mariadb-client"
+     state: latest
+  when:
+    - ansible_facts.distribution == "Debian" or ansible_facts.distribution == "Ubuntu" or ansible_facts.distribution == "Linux Mint"
+  tags:
+    - mariadb
+
+- name: "Installer - Schedule - Setup"
+  cron:
+    name: PATH
+    env: yes
+    value: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+- name: "Installer - Schedule - Maintenance"
+  cron:
+    name: Maintenance
+    hour: "*/3"
+    minute: "0"
+    job: "/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mkj-infra --accept-host-key --vault-password-file ~/.ansible/vault.yml --private-key ~/.ssh/id_rsa tasks.yml -t maintenance"
+  tags:
+    - cron
+
+- name: "Installer - Schedule - Deployer"
+  cron:
+    name: Deployer
+    minute: "*/5"
+    job: "/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mkj-infra --accept-host-key --vault-password-file ~/.ansible/vault.yml --private-key ~/.ssh/id_rsa tasks.yml -t deployer"
+  tags:
+    - cron

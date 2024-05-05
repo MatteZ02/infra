@@ -1,0 +1,37 @@
+---
+- name: "Maintenance - OS Update"
+  apt:
+    upgrade: dist
+    update_cache: yes
+
+- name: "Maintenance - Ansible : Dependencies - Python Library : hvac"
+  pip:
+    name: hvac
+    state: latest
+    extra_args: --upgrade
+    virtualenv: /opt/ansible
+    virtualenv_command: "python3 -m venv"
+
+- name: "Maintenance - Ansible : Dependencies - Python Library : netaddr"
+  pip:
+    name: netaddr
+    state: latest
+    extra_args: --upgrade
+    virtualenv: /opt/ansible
+    virtualenv_command: "python3 -m venv"
+
+- name: "Maintenance - Ansible : Dependencies - Python Library : jmespath"
+  pip:
+    name: jmespath
+    state: latest
+    extra_args: --upgrade
+    virtualenv: /opt/ansible
+    virtualenv_command: "python3 -m venv"
+
+- name: "Maintenance - Ansible : Dependencies - Python Library : pexpect"
+  pip:
+    name: pexpect
+    state: latest
+    extra_args: --upgrade
+    virtualenv: /opt/ansible
+    virtualenv_command: "python3 -m venv"

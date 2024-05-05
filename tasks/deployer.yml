@@ -1,0 +1,152 @@
+---
+- name: "Deployer - Certbot - Renew Certificates"
+  command: "certbot renew"
+  register: task
+  changed_when: task.stdout.find("No renewals were attempted.") == -1
+  tags:
+    - certbot
+    - tls
+
+- name: "Deployer - Certbot - Copy Certificates"
+  copy:
+    src: "/etc/letsencrypt/live/mkj/"
+    dest: "/root/certs/mkj/"
+    follow: true
+  register: task
+  tags:
+    - certbot
+    - tls
+
+- name: "Deployer - MariaDB - Pull Image"
+  containers.podman.podman_image:
+    name: docker.io/mariadb
+    tag: latest
+    force: on
+  register: deployerTask101
+
+- name: "Deployer - MariaDB - Run Container"
+  containers.podman.podman_container:
+    name: mariadb
+    image: docker.io/mariadb:latest
+    state: started
+    restart: on
+    network: host
+    volumes:
+      - "/root/mariadb:/var/lib/mysql"
+    restart_policy: always
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ secrets.mariadb.root.password }}"
+  register: deployerTask102
+  when:
+    - (deployerTask101 is defined and deployerTask101.changed) or deployerTask101 is undefined
+  tags:
+    - mariadb
+
+- name: "Deployer - MariaDB - Wait"
+  wait_for:
+    host: "127.0.0.1"
+    port: "3306"
+    delay: 10
+  when:
+    - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
+  tags:
+    - mariadb
+
+- name: "Deployer - MariaDB - Upgrade"
+  containers.podman.podman_container_exec:
+    name: mariadb
+    command: "mariadb-upgrade --host=127.0.0.1 --user=root --password={{ secrets.mariadb.root.password }}"
+  register: task
+  ignore_errors: yes
+  changed_when:
+    - task.stdout is defined
+    - task.stdout.find("This installation of MariaDB is already upgraded") == -1
+  when:
+    - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
+  tags:
+    - mariadb
+
+- name: "Deployer - MariaDB - Create Users"
+  mysql_user:
+    login_host: "127.0.0.1"
+    login_user: root
+    login_password: "{{ secrets.mariadb.root.password }}"
+    name: "mkj"
+    host: "%"
+    password: "{{ secrets.mariadb.mkj.password }}"
+    priv: "mkj.*:ALL"
+  vars:
+    ansible_python_interpreter: "/opt/ansible/bin/python3"
+  when:
+    - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
+  tags:
+    - mariadb
+
+- name: "Deployer - MariaDB - Create Database"
+  mysql_db:
+    login_host: "127.0.0.1"
+    login_user: "mkj"
+    login_password: "{{ secrets.mariadb.mkj.password }}"
+    name: "mkj"
+  vars:
+    ansible_python_interpreter: "/opt/ansible/bin/python3"
+  when:
+    - (deployerTask102 is defined and deployerTask102.changed) or deployerTask102 is undefined
+  tags:
+    - mariadb
+
+- name: "Deployer - Nginx - Configure - Create Folder"
+  file:
+    path: "/root/nginx/"
+    state: directory
+  tags:
+    - nginx
+
+- name: "Deployer - Nginx - Configure - Create Subfolders"
+  file:
+    dest: '/root/nginx/{{ item.path }}'
+    state: directory
+  with_filetree: './files/nginx/'
+  loop_control:
+    label: "{{ item.path }}"
+  when:
+    - item.state == 'directory'
+  tags:
+    - nginx
+
+- name: "Deployer - Nginx - Configure - Generating & Transferring Files"
+  template:
+    src: '{{ item.src }}'
+    dest: '/root/nginx/{{ item.path }}'
+  with_filetree: './files/nginx/'
+  loop_control:
+    label: "{{ item.path }}"
+  when:
+    - item.state == 'file'
+  tags:
+    - nginx
+
+- name: "Deployer - Nginx - Pull Image"
+  containers.podman.podman_image:
+    name: docker.io/nginx
+    tag: latest
+    force: on
+  register: deployerTask3
+
+- name: "Deployer - Nginx - Run Container"
+  containers.podman.podman_container:
+    name: nginx
+    image: docker.io/nginx
+    state: started
+    recreate: on
+    network: host
+    volumes:
+      - "/root/nginx/html:/usr/share/nginx/html:ro"
+      - "/root/nginx/config.conf:/etc/nginx/nginx.conf:ro"
+      - "/root/nginx/conf/:/etc/nginx/conf.d/:ro"
+      - "/root/certs/:/etc/nginx/certs/:ro"
+    restart_policy: always
+  when:
+    - (deployerTask3 is defined and deployerTask3.changed) or deployerTask3 is undefined
+  tags:
+    - nginx
