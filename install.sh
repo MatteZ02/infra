@@ -7,7 +7,7 @@ fi
 echo "
 ==============================
 
-Multi Platform Project - Ansible
+MPP - Infra
 Install Script
 
 ------------------------------
@@ -31,8 +31,18 @@ python3 -m venv /opt/ansible &> /dev/null
 
 /opt/ansible/bin/ansible-galaxy collection install -r requirements.yml --upgrade &> /dev/null
 
-/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --private-key ~/.ssh/id_rsa tasks.yml -t installer
+mkdir -p ~/.ansible &> /dev/null
 
+if [[ ! -f ~/.ansible/vault.yml ]]
+then
+    echo -n "Vault Password: "
+    read PASSWORD
+    echo "$PASSWORD" > ~/.ansible/vault.yml
+fi
+
+ssh-keyscan github.com 1> ~/.ssh/known_hosts 2> /dev/null
+
+/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/mpp-ansible --accept-host-key --private-key ~/.ssh/id_rsa --vault-password-file ~/.ansible/vault.yml tasks.yml -t installer
 
 echo "
 ==============================
