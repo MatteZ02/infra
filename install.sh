@@ -25,6 +25,7 @@ exit 1
 
 mkdir -p ~/.ssh &> /dev/null
 
+apt-get update &> /dev/null
 apt-get install -y python3-pip python3-venv jq git curl &> /dev/null
 python3 -m venv /opt/ansible &> /dev/null
 /opt/ansible/bin/pip3 install ansible hvac netaddr jmespath pexpect &> /dev/null
