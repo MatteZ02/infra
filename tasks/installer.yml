@@ -119,6 +119,13 @@
   tags:
     - certbot
 
+- name: "Installer - Certbot - Create Folder"
+  file:
+    path: "/etc/letsencrypt/renewal-hooks/pre"
+    state: directory
+  tags:
+    - certbot
+
 - name: "Installer - Certbot - Auth Hook"
   copy:
     src: "../files/certbot/nginx.sh"
