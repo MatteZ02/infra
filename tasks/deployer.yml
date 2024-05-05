@@ -17,6 +17,13 @@
     - certbot
     - tls
 
+- name: "Deployer - MariaDB - Create Folder"
+  file:
+    path: "/root/mariadb"
+    state: directory
+  tags:
+    - mariadb
+
 - name: "Deployer - MariaDB - Pull Image"
   containers.podman.podman_image:
     name: docker.io/mariadb
