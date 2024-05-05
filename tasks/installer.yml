@@ -142,7 +142,7 @@
   vars:
     cert:
       name: mkj
-      email: "{{ config.certbot.email }}"
+      email: "{{ secrets.certbot.email }}"
       domains:
         - "{{ ansible_facts.fqdn }}"
   tags:
