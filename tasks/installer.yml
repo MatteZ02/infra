@@ -136,7 +136,7 @@
 
 - name: "Installer - Certbot - Self-Signed Certificates - Generate Private Key"
   community.crypto.openssl_privatekey:
-    path: "/root/certs/mpp/privatekey.pem"
+    path: "/root/certs/mpp/privkey.pem"
     type: RSA
     size: 2048
     regenerate: never
@@ -144,13 +144,13 @@
 - name: "Installer - Certbot - Self-Signed Certificates - Create Certificate Signing Request"
   community.crypto.openssl_csr:
     common_name: "{{ ansible_facts.fqdn }}"
-    privatekey_path: "/root/certs/mpp/privatekey.pem"
+    privatekey_path: "/root/certs/mpp/privkey.pem"
     path: "/root/certs/mpp/csr.pem"
 
 - name: "Installer - Certbot - Self-Signed Certificates - Generate Certificate"
   community.crypto.x509_certificate:
     path: "/root/certs/mpp/fullchain.pem"
-    privatekey_path: "/root/certs/mpp/privatekey.pem"
+    privatekey_path: "/root/certs/mpp/privkey.pem"
     csr_path: "/root/certs/mpp/csr.pem"
     provider: selfsigned
 
