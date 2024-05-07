@@ -160,8 +160,32 @@
 
 - name: "Deployer - Wordpress - Create Folder"
   file:
-    path: "/root/wordpress/wp-content"
+    path: "/root/wordpress/data/wp-content"
     state: directory
+  tags:
+    - wordpress
+
+- name: "Deployer - Wordpress - Configure - Create Subfolders"
+  file:
+    dest: '/root/wordpress/{{ item.path }}'
+    state: directory
+  with_filetree: './files/wordpress/'
+  loop_control:
+    label: "{{ item.path }}"
+  when:
+    - item.state == 'directory'
+  tags:
+    - wordpress
+
+- name: "Deployer - Wordpress - Configure - Generating & Transferring Files"
+  template:
+    src: '{{ item.src }}'
+    dest: '/root/wordpress/{{ item.path }}'
+  with_filetree: './files/wordpress/'
+  loop_control:
+    label: "{{ item.path }}"
+  when:
+    - item.state == 'file'
   tags:
     - wordpress
 
@@ -180,7 +204,9 @@
     recreate: on
     network: host
     volumes:
-      - "/root/wordpress/wp-content/:/var/www/html/wp-content/"
+      - "/root/wordpress/data/wp-content/:/var/www/html/wp-content/"
+      - "/root/wordpress/conf/000-default.conf:/etc/apache2/sites-enabled/000-default.conf"
+      - "/root/wordpress/conf/ports.conf:/etc/apache2/ports.conf"
     env:
       WORDPRESS_DB_HOST: "127.0.0.1"
       WORDPRESS_DB_USER: "mkj"
