@@ -160,7 +160,7 @@
 
 - name: "Deployer - Wordpress - Create Folder"
   file:
-    path: "/root/wordpress"
+    path: "/root/wordpress/wp-content"
     state: directory
   tags:
     - wordpress
@@ -172,7 +172,7 @@
     force: on
   register: deployerTask4
 
-- name: "Deployer - Workpress - Run Container"
+- name: "Deployer - Wordpress - Run Container"
   containers.podman.podman_container:
     name: wordpress
     image: docker.io/library/wordpress:latest
@@ -180,16 +180,16 @@
     recreate: on
     network: host
     volumes:
-      - "/var/www/html/wp-content/:/var/www/html/wp-content/"
+      - "/root/wordpress/wp-content/:/var/www/html/wp-content/"
     env:
       WORDPRESS_DB_HOST: "127.0.0.1"
       WORDPRESS_DB_USER: "mkj"
       WORDPRESS_DB_PASSWORD: "{{ secrets.mariadb.users.mkj.password }}"
       WORDPRESS_DB_NAME: "mkj"
-      WORDPRESS_AUTH_KEY: "{{ secrets.wordpress.keys.auth }}"
-      WORDPRESS_SECURE_AUTH_KEY: "{{ secrets.wordpress.keys.secure_auth }}"
-      WORDPRESS_LOGGED_IN_KEY: "{{ secrets.wordpress.keys.logged_in }}"
-      WORDPRESS_NONCE_KEY: "{{ secrets.wordpress.keys.nonce }}"
+      WORDPRESS_AUTH_KEY: "{{ secrets.wordpress['keys'].auth }}"
+      WORDPRESS_SECURE_AUTH_KEY: "{{ secrets.wordpress['keys'].secure_auth }}"
+      WORDPRESS_LOGGED_IN_KEY: "{{ secrets.wordpress['keys'].logged_in }}"
+      WORDPRESS_NONCE_KEY: "{{ secrets.wordpress['keys'].nonce }}"
       WORDPRESS_AUTH_SALT: "{{ secrets.wordpress.salt.auth }}"
       WORDPRESS_SECURE_AUTH_SALT: "{{ secrets.wordpress.salt.secure_auth }}"
       WORDPRESS_LOGGED_IN_SALT: "{{ secrets.wordpress.salt.logged_in }}"
