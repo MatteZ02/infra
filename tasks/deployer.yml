@@ -26,7 +26,7 @@
 
 - name: "Deployer - MariaDB - Pull Image"
   containers.podman.podman_image:
-    name: docker.io/mariadb
+    name: docker.io/library/mariadb
     tag: latest
     force: on
   register: deployerTask101
@@ -34,15 +34,15 @@
 - name: "Deployer - MariaDB - Run Container"
   containers.podman.podman_container:
     name: mariadb
-    image: docker.io/mariadb:latest
+    image: docker.io/library/mariadb:latest
     state: started
     restart: on
     network: host
     volumes:
       - "/root/mariadb:/var/lib/mysql"
-    restart_policy: always
     env:
       MYSQL_ROOT_PASSWORD: "{{ secrets.mariadb.users.root.password }}"
+    restart_policy: always
   register: deployerTask102
   when:
     - (deployerTask101 is defined and deployerTask101.changed) or deployerTask101 is undefined
@@ -135,7 +135,7 @@
 
 - name: "Deployer - Nginx - Pull Image"
   containers.podman.podman_image:
-    name: docker.io/nginx
+    name: docker.io/library/nginx
     tag: latest
     force: on
   register: deployerTask3
@@ -143,7 +143,7 @@
 - name: "Deployer - Nginx - Run Container"
   containers.podman.podman_container:
     name: nginx
-    image: docker.io/nginx
+    image: docker.io/library/nginx:latest
     state: started
     recreate: on
     network: host
@@ -157,3 +157,38 @@
     - (deployerTask3 is defined and deployerTask3.changed) or deployerTask3 is undefined
   tags:
     - nginx
+
+- name: "Deployer - Wordpress - Pull Image"
+  containers.podman.podman_image:
+    name: docker.io/library/wordpress
+    tag: latest
+    force: on
+  register: deployerTask4
+
+- name: "Deployer - Workpress - Run Container"
+  containers.podman.podman_container:
+    name: wordpress
+    image: docker.io/library/wordpress:latest
+    state: started
+    recreate: on
+    network: host
+    volumes:
+      - "/var/www/html/wp-content/:/var/www/html/wp-content/"
+    env:
+      WORDPRESS_DB_HOST: "127.0.0.1"
+      WORDPRESS_DB_USER: "mkj"
+      WORDPRESS_DB_PASSWORD: "{{ secrets.mariadb.users.mkj.password }}"
+      WORDPRESS_DB_NAME: "mkj"
+      WORDPRESS_AUTH_KEY: "{{ secrets.wordpress.keys.auth }}"
+      WORDPRESS_SECURE_AUTH_KEY: "{{ secrets.wordpress.keys.secure_auth }}"
+      WORDPRESS_LOGGED_IN_KEY: "{{ secrets.wordpress.keys.logged_in }}"
+      WORDPRESS_NONCE_KEY: "{{ secrets.wordpress.keys.nonce }}"
+      WORDPRESS_AUTH_SALT: "{{ secrets.wordpress.salt.auth }}"
+      WORDPRESS_SECURE_AUTH_SALT: "{{ secrets.wordpress.salt.secure_auth }}"
+      WORDPRESS_LOGGED_IN_SALT: "{{ secrets.wordpress.salt.logged_in }}"
+      WORDPRESS_NONCE_SALT: "{{ secrets.wordpress.salt.nonce }}"
+    restart_policy: always
+  when:
+    - (deployerTask4 is defined and deployerTask4.changed) or deployerTask4 is undefined
+  tags:
+    - wordpress
