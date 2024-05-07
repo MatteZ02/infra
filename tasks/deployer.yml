@@ -160,8 +160,16 @@
 
 - name: "Deployer - Wordpress - Create Folder"
   file:
-    path: "/root/wordpress/data/wp-content"
+    path: "{{ path }}"
     state: directory
+  vars:
+    paths:
+      - /root/wordpress/data/wp-content/plugins
+      - /root/wordpress/data/wp-content/uploads
+  loop: "{{ paths }}"
+  loop_control:
+    label: "{{ path }}"
+    loop_var: "path"
   tags:
     - wordpress
 
@@ -204,7 +212,8 @@
     recreate: on
     network: host
     volumes:
-      - "/root/wordpress/data/wp-content/:/var/www/html/wp-content/"
+      - "/root/wordpress/data/wp-content/plugins:/var/www/html/wp-content/plugins"
+      - "/root/wordpress/data/wp-content/uploads:/var/www/html/wp-content/uploads"
       - "/root/wordpress/conf/000-default.conf:/etc/apache2/sites-enabled/000-default.conf"
       - "/root/wordpress/conf/ports.conf:/etc/apache2/ports.conf"
     env:
