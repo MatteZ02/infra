@@ -158,6 +158,13 @@
   tags:
     - nginx
 
+- name: "Deployer - Wordpress - Create Folder"
+  file:
+    path: "/root/wordpress"
+    state: directory
+  tags:
+    - wordpress
+
 - name: "Deployer - Wordpress - Pull Image"
   containers.podman.podman_image:
     name: docker.io/library/wordpress
