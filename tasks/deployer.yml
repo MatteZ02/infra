@@ -197,6 +197,14 @@
   tags:
     - wordpress
 
+- name: "Deployer - Wordpress - Configure - Theme - Git Operations"
+  git:
+    repo: https://github.com/MatteZ02/wp-smarter-inside.git
+    dest: /root/wordpress/data/wp-content/themes/smarter-inside
+    version: main
+  tags:
+    - wordpress
+
 - name: "Deployer - Wordpress - Pull Image"
   containers.podman.podman_image:
     name: docker.io/library/wordpress
@@ -212,6 +220,7 @@
     recreate: on
     network: host
     volumes:
+      - "/root/wordpress/data/wp-content/themes/smarter-inside:/var/www/html/wp-content/themes/smarter-inside"
       - "/root/wordpress/data/wp-content/plugins:/var/www/html/wp-content/plugins"
       - "/root/wordpress/data/wp-content/uploads:/var/www/html/wp-content/uploads"
       - "/root/wordpress/conf/000-default.conf:/etc/apache2/sites-enabled/000-default.conf"
