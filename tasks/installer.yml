@@ -86,14 +86,14 @@
   tags:
     - certbot
 
-- name: "Installer : Certbot : Auth Hook"
-  get_url:
-    url: "https://git.waren.io/warengroup/acme-dns-auth/raw/branch/master/acme-dns-auth.py"
-    dest: "~/data/letsencrypt/config/renewal-hooks/pre/acme-dns-auth.py"
-    mode: '700'
-    force: true
-  tags:
-    - certbot
+# - name: "Installer : Certbot : Auth Hook"
+#   get_url:
+#     url: "https://git.waren.io/warengroup/acme-dns-auth/raw/branch/master/acme-dns-auth.py"
+#     dest: "~/data/letsencrypt/config/renewal-hooks/pre/acme-dns-auth.py"
+#     mode: '700'
+#     force: true
+#   tags:
+#     - certbot
 
 - name: "Installer : Certbot : Create Certificates"
   command: "certbot certonly --cert-name {{ cert.name }} --manual --preferred-challenges dns-01 --email {{ cert.email }} --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -n --manual-auth-hook ~/data/letsencrypt/config/renewal-hooks/pre/acme-dns-auth.py --debug-challenges --preferred-chain='ISRG Root X1' --key-type rsa -d {{ cert.domains | join(' -d ') }} --config-dir ~/data/letsencrypt/config --logs-dir ~/data/letsencrypt/logs --work-dir ~/data/letsencrypt/work"
