@@ -103,8 +103,7 @@
     loop_var: "cert"
   vars:
     certs:
-      arcadiamc:
-        name: arcadiamc
+      - name: arcadiamc
         email: mattez02.contact@gmail.com
         domains:
           - arcadiamc.wgi.fi
