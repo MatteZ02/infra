@@ -61,42 +61,35 @@
     label: "{{ library }}"
     loop_var: "library"
 
-- name: "Installer : Certbot : Install"
-  pip:
-    name: certbot
-    state: latest
-    extra_args: --upgrade
-    virtualenv: ~/.venv/ansible
-    virtualenv_command: "python3 -m venv"
+- name: "Installer : Certbot : Auth Hook - Create Folder"
+  file:
+    path: ~/data/certbot/auth-hooks
+    state: directory
   tags:
     - certbot
 
-- name: "Installer : Certbot : Create Symbolic Links"
-  ansible.builtin.file:
-    src: ~/.venv/ansible/bin/{{ binary }}
-    dest: ~/bin/{{ binary }}
-    state: link
-  vars:
-    binaries:
-      - certbot
-  loop: "{{ binaries }}"
-  loop_control:
-    label: "{{ binary }}"
-    loop_var: "binary"
+- name: "Installer : Certbot : Auth Hook - Download"
+  get_url:
+    url: "https://git.waren.io/warengroup/acme-dns-auth/raw/branch/master/acme-dns-auth.py"
+    dest: "~/data/certbot/auth-hooks/acme-dns.py"
+    mode: '700'
+    force: true
   tags:
     - certbot
-
-# - name: "Installer : Certbot : Auth Hook"
-#   get_url:
-#     url: "https://git.waren.io/warengroup/acme-dns-auth/raw/branch/master/acme-dns-auth.py"
-#     dest: "~/data/letsencrypt/config/renewal-hooks/pre/acme-dns-auth.py"
-#     mode: '700'
-#     force: true
-#   tags:
-#     - certbot
 
 - name: "Installer : Certbot : Create Certificates"
-  command: "certbot certonly --cert-name {{ cert.name }} --manual --preferred-challenges dns-01 --email {{ cert.email }} --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -n --manual-auth-hook ~/data/letsencrypt/config/renewal-hooks/pre/acme-dns-auth.py --debug-challenges --preferred-chain='ISRG Root X1' --key-type rsa -d {{ cert.domains | join(' -d ') }} --config-dir ~/data/letsencrypt/config --logs-dir ~/data/letsencrypt/logs --work-dir ~/data/letsencrypt/work"
+  containers.podman.podman_container:
+    name: certbot
+    image: "docker.io/certbot/certbot:latest"
+    state: started
+    network: host
+    volumes:
+      - "{{ ansible_facts.user_dir }}/data/certbot:/etc/letsencrypt"
+    command: "certonly --cert-name {{ cert.name }} --manual --preferred-challenges dns-01 --email {{ cert.email }} --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -n --manual-auth-hook /etc/letsencrypt/auth-hooks/acme-dns.py --debug-challenges --key-type rsa -d {{ cert.domains | join(' -d ') }}"
+    detach: false
+  register: task
+  changed_when:
+    - task.stdout.find("Certificate not yet due for renewal; no action taken.") == -1
   loop: "{{ certs }}"
   loop_control:
     label: "{{ cert.name }}"
@@ -107,8 +100,6 @@
         email: mattez02.contact@gmail.com
         domains:
           - arcadiamc.wgi.fi
-  register: task
-  changed_when: task.stdout.find("Certificate not yet due for renewal; no action taken.") == -1
   tags:
     - certbot
 

@@ -1,15 +1,24 @@
 ---
 - name: "Deployer - Certbot - Renew Certificates"
-  command: "certbot renew --config-dir ~/data/letsencrypt/config --logs-dir ~/data/letsencrypt/logs --work-dir ~/data/letsencrypt/work"
+  containers.podman.podman_container:
+    name: certbot
+    image: "docker.io/certbot/certbot:latest"
+    state: started
+    network: host
+    volumes:
+      - "{{ ansible_facts.user_dir }}/data/certbot:/etc/letsencrypt"
+    command: "renew"
+    detach: false
   register: task
-  changed_when: task.stdout.find("No renewals were attempted.") == -1
+  changed_when:
+    - task.stdout.find("No renewals were attempted.") == -1
   tags:
     - certbot
     - tls
 
 - name: "Deployer - Certbot - Copy Certificates"
   copy:
-    src: "~/data/letsencrypt/live/{{ cert }}/"
+    src: "~/data/certbot/live/{{ cert }}/"
     dest: "~/data/certificates/{{ cert }}/"
     follow: true
   loop: "{{ certs }}"
