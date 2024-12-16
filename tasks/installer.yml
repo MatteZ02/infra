@@ -1,0 +1,131 @@
+---
+- name: "Installer - Ansible - Python Library"
+  pip:
+    name: ansible
+    state: latest
+    extra_args: --upgrade
+    virtualenv: ~/.venv/ansible
+    virtualenv_command: "python3 -m venv"
+  tags:
+    - ansible
+
+- name: "Installer : Ansible : Create Folder"
+  file:
+    path: ~/bin
+    state: directory
+  tags:
+    - ansible
+
+- name: "Installer : Ansible : Create Symbolic Links"
+  ansible.builtin.file:
+    src: ~/.venv/ansible/bin/{{ binary }}
+    dest: ~/bin/{{ binary }}
+    state: link
+  vars:
+    binaries:
+      - ansible
+      - ansible-community
+      - ansible-config
+      - ansible-console
+      - ansible-doc
+      - ansible-galaxy
+      - ansible-inventory
+      - ansible-playbook
+      - ansible-pull
+      - ansible-test
+      - ansible-vault
+  loop: "{{ binaries }}"
+  loop_control:
+    label: "{{ binary }}"
+    loop_var: "binary"
+  tags:
+    - ansible
+
+- name: "Installer - Ansible - Dependencies / Python Libraries"
+  pip:
+    name: "{{ library }}"
+    state: latest
+    extra_args: --upgrade
+    virtualenv: ~/.venv/ansible
+    virtualenv_command: "python3 -m venv"
+  vars:
+    libraries:
+      - cryptography
+      - dnspython
+      - hvac
+      - jmespath
+      - netaddr
+      - pexpect
+  loop: "{{ libraries }}"
+  loop_control:
+    label: "{{ library }}"
+    loop_var: "library"
+
+- name: "Installer : Certbot : Install"
+  pip:
+    name: certbot
+    state: latest
+    extra_args: --upgrade
+    virtualenv: ~/.venv/ansible
+    virtualenv_command: "python3 -m venv"
+  tags:
+    - certbot
+
+- name: "Installer : Certbot : Create Symbolic Links"
+  ansible.builtin.file:
+    src: ~/.venv/ansible/bin/{{ binary }}
+    dest: ~/bin/{{ binary }}
+    state: link
+  vars:
+    binaries:
+      - certbot
+  loop: "{{ binaries }}"
+  loop_control:
+    label: "{{ binary }}"
+    loop_var: "binary"
+  tags:
+    - certbot
+
+- name: "Installer : Certbot : Auth Hook"
+  get_url:
+    url: "https://git.waren.io/warengroup/acme-dns-auth/raw/branch/master/acme-dns-auth.py"
+    dest: "~/data/letsencrypt/config/renewal-hooks/pre/acme-dns-auth.py"
+    mode: '700'
+    force: true
+  tags:
+    - certbot
+
+- name: "Installer : Certbot : Create Certificates"
+  command: "certbot certonly --cert-name {{ cert.name }} --manual --preferred-challenges dns-01 --email {{ cert.email }} --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -n --manual-auth-hook ~/data/letsencrypt/config/renewal-hooks/pre/acme-dns-auth.py --debug-challenges --preferred-chain='ISRG Root X1' --key-type rsa -d {{ cert.domains | join(' -d ') }} --config-dir ~/data/letsencrypt/config --logs-dir ~/data/letsencrypt/logs --work-dir ~/data/letsencrypt/work"
+  loop: "{{ certs }}"
+  loop_control:
+    label: "{{ cert.name }}"
+    loop_var: "cert"
+  vars:
+    certs:
+      arcadiamc:
+        name: arcadiamc
+        email: mattez02.contact@gmail.com
+        domains:
+          - arcadiamc.wgi.fi
+  register: task
+  changed_when: task.stdout.find("Certificate not yet due for renewal; no action taken.") == -1
+  tags:
+    - certbot
+
+- name: "Installer : Schedule : Maintenance"
+  cron:
+    name: "Matte - Maintenance"
+    hour: "*/3"
+    minute: "0"
+    job: "~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml tasks.yml -t maintenance"
+  tags:
+    - cron
+
+- name: "Installer : Schedule : Deployer"
+  cron:
+    name: "Matte - Deployer"
+    minute: "*/5"
+    job: "~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml tasks.yml -t deployer"
+  tags:
+    - cron

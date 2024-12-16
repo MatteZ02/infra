@@ -1,0 +1,25 @@
+---
+- name: "Deployer - Certbot - Renew Certificates"
+  command: "certbot renew --config-dir ~/data/letsencrypt/config --logs-dir ~/data/letsencrypt/logs --work-dir ~/data/letsencrypt/work"
+  register: task
+  changed_when: task.stdout.find("No renewals were attempted.") == -1
+  tags:
+    - certbot
+    - tls
+
+- name: "Deployer - Certbot - Copy Certificates"
+  copy:
+    src: "~/data/letsencrypt/live/{{ cert }}/"
+    dest: "~/data/certificates/{{ cert }}/"
+    follow: true
+  loop: "{{ certs }}"
+  loop_control:
+    label: "{{ cert }}"
+    loop_var: "cert"
+  vars:
+    certs:
+      - arcadiamc
+  register: task
+  tags:
+    - certbot
+    - tls

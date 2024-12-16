@@ -1,0 +1,36 @@
+---
+- name: "Installer - Ansible - Dependencies / Python Libraries"
+  pip:
+    name: "{{ library }}"
+    state: latest
+    extra_args: --upgrade
+    virtualenv: ~/.venv/ansible
+    virtualenv_command: "python3 -m venv"
+  vars:
+    libraries:
+      - cryptography
+      - dnspython
+      - hvac
+      - jmespath
+      - netaddr
+      - pexpect
+  loop: "{{ libraries }}"
+  loop_control:
+    label: "{{ library }}"
+    loop_var: "library"
+
+- name: "Maintenance : Ansible : Update"
+  pip:
+    name: ansible
+    state: latest
+    extra_args: --upgrade
+    virtualenv: ~/.venv/ansible
+    virtualenv_command: "python3 -m venv"
+
+- name: "Maintenance : Podman : Prune"
+  containers.podman.podman_prune:
+    container: yes
+    image: yes
+    image_filters:
+        dangling_only: no
+    volume: yes
