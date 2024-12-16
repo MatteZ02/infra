@@ -105,7 +105,7 @@
 
 - name: "Installer : Schedule : Maintenance"
   cron:
-    name: "Matte - Maintenance"
+    name: "Matte - Infra - Maintenance"
     hour: "*/3"
     minute: "0"
     job: "~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml tasks.yml -t maintenance"
@@ -114,7 +114,7 @@
 
 - name: "Installer : Schedule : Deployer"
   cron:
-    name: "Matte - Deployer"
+    name: "Matte - Infra - Deployer"
     minute: "*/5"
     job: "~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml tasks.yml -t deployer"
   tags:
