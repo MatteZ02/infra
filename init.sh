@@ -23,25 +23,29 @@ exit 1
 
 }
 
-mkdir -p ~/.ssh &> /dev/null
+mkdir -p ~/.ssh/keys/matte &> /dev/null
+if [[ ! -f ~/.ssh/keys/matte/infra ]]
+then
+    ssh-keygen -f ~/.ssh/keys/matte/infra -t ed25519 -N '' &> /dev/null
+fi
 
-apt-get update &> /dev/null
-apt-get install -y python3-pip python3-venv jq git curl &> /dev/null
-python3 -m venv /opt/ansible &> /dev/null
-/opt/ansible/bin/pip3 install ansible hvac netaddr jmespath pexpect &> /dev/null
+python3 -m venv ~/.venv/ansible &> /dev/null
+~/.venv/ansible/bin/pip3 install cryptography dnspython hvac jmespath netaddr pexpect &> /dev/null
+~/.venv/ansible/bin/pip3 install ansible &> /dev/null
 
-/opt/ansible/bin/ansible-galaxy collection install -r requirements.yml --upgrade &> /dev/null
+~/.venv/ansible/bin/ansible-galaxy collection install ansible.posix containers.podman --upgrade &> /dev/null
+
 
 mkdir -p ~/.ansible &> /dev/null
 
-if [[ ! -f ~/.ansible/vault.yml ]]
+if [[ ! -f ~/.ansible/vault/matte.yml ]]
 then
     echo -n "Vault Password: "
     read PASSWORD
-    echo "$PASSWORD" > ~/.ansible/vault.yml
+    echo "$PASSWORD" > ~/.ansible/vault/matte.yml
 fi
 
-/opt/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra --accept-host-key --private-key ~/.ssh/id_rsa --vault-password-file ~/.ansible/vault.yml tasks.yml -t installer
+~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml tasks.yml -t installer
 
 echo "
 ==============================
