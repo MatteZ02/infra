@@ -10,12 +10,12 @@ action=$1
 
 encrypt() {
     echo "${underline}Encrypting...${nounderline}"
-    execute "ansible-vault encrypt --vault-id default@vault/mkj"
+    execute "ansible-vault encrypt --vault-id matte@vault/matte"
 }
 
 decrypt() {
     echo "${underline}Decrypting...${nounderline}"
-    execute "ansible-vault decrypt --vault-id default@vault/mkj"
+    execute "ansible-vault decrypt --vault-id matte@vault/matte"
 }
 
 list() {
