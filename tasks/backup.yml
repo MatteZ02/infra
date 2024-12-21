@@ -1,0 +1,19 @@
+---
+- name: "Backup - Minecraft - Stop"
+  containers.podman.podman_container:
+    name: minecraft
+    state: stopped
+
+- name: "Backup - Minecraft - Save"
+  community.general.archive:
+    path:
+      - "~/data/minecraft"
+    exclude_path:
+      - "~/data/minecraft/plugins/dynmap/web/tiles"
+    dest: "~/data/backups/minecraft-{{ ansible_facts.date_time.date }}.zip"
+    format: zip
+
+- name: "Backup - Minecraft - Start"
+  containers.podman.podman_container:
+    name: minecraft
+    state: started
