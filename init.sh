@@ -33,7 +33,7 @@ python3 -m venv ~/.venv/ansible &> /dev/null
 ~/.venv/ansible/bin/pip3 install cryptography dnspython hvac jmespath netaddr pexpect &> /dev/null
 ~/.venv/ansible/bin/pip3 install ansible &> /dev/null
 
-~/.venv/ansible/bin/ansible-galaxy collection install ansible.posix containers.podman --upgrade &> /dev/null
+~/.venv/ansible/bin/ansible-galaxy collection install community.general containers.podman --upgrade &> /dev/null
 
 
 mkdir -p ~/.ansible &> /dev/null
