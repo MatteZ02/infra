@@ -123,7 +123,7 @@
 - name: "Installer : Schedule : Backup"
   ansible.builtin.cron:
     name: "Matte - Infra - Backup"
-    hour: "5"
+    hour: "4"
     minute: "0"
     job: "~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml tasks.yml -t backup"
   tags:
