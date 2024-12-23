@@ -4,32 +4,14 @@
     name: minecraft
     state: stopped
 
-- name: "Backup - Minecraft - Create Directory"
-  ansible.builtin.file:
-    path: ~/data/backups/tmp
-    state: directory
-
-- name: "Backup - Minecraft - Copy"
-  ansible.builtin.copy:
-    src: "~/data/minecraft"
-    dest: "~/data/backups/tmp"
-
-- name: "Backup - Minecraft - Delete"
-  ansible.builtin.file:
-    path: ~/data/backups/tmp/minecraft/plugins/dynmap/web/tiles
-    state: absent
-
 - name: "Backup - Minecraft - Save"
   community.general.archive:
     path:
-      - "~/data/backups/tmp/minecraft"
-    dest: "~/data/backups/minecraft-{{ ansible_facts.date_time.date }}.zip"
+      - "~/data/minecraft"
+    exclusion_patterns:
+      - "plugins/dynmap/web/tiles/*"
+    dest: "~/data/backups/minecraft-{{ ansible_facts.date_time.date + '-' + ansible_facts.date_time.hour + '-' + ansible_facts.date_time.minute + '-' + ansible_facts.date_time.second }}.zip"
     format: zip
-
-- name: "Backup - Minecraft - Clean"
-  ansible.builtin.file:
-    path: ~/data/backups/tmp/minecraft
-    state: absent
 
 - name: "Backup - Minecraft - Start"
   containers.podman.podman_container:
