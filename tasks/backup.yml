@@ -8,8 +8,6 @@
   community.general.archive:
     path:
       - "~/data/minecraft"
-    exclusion_patterns:
-      - "plugins/dynmap/web/tiles/*"
     dest: "~/data/backups/minecraft-{{ ansible_facts.date_time.date + '-' + ansible_facts.date_time.hour + '-' + ansible_facts.date_time.minute + '-' + ansible_facts.date_time.second }}.zip"
     format: zip
 
