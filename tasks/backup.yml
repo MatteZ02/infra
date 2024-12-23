@@ -12,8 +12,7 @@
 - name: "Backup - Minecraft - Copy"
   ansible.builtin.copy:
     src: "~/data/minecraft"
-    dest: "~/data/backups/tmp/minecraft"
-    follow: true
+    dest: "~/data/backups/tmp"
 
 - name: "Backup - Minecraft - Delete"
   ansible.builtin.file:
