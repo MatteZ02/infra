@@ -17,7 +17,7 @@
     - tls
 
 - name: "Deployer - Certbot - Copy Certificates"
-  copy:
+  ansible.builtin.copy:
     src: "~/data/certbot/live/{{ cert }}/"
     dest: "~/data/certificates/{{ cert }}/"
     follow: true

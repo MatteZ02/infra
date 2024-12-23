@@ -1,6 +1,6 @@
 ---
 - name: "Installer - Ansible - Python Library"
-  pip:
+  ansible.builtin.pip:
     name: ansible
     state: latest
     extra_args: --upgrade
@@ -10,7 +10,7 @@
     - ansible
 
 - name: "Installer : Ansible : Create Folder"
-  file:
+  ansible.builtin.file:
     path: ~/bin
     state: directory
   tags:
@@ -42,7 +42,7 @@
     - ansible
 
 - name: "Installer - Ansible - Dependencies / Python Libraries"
-  pip:
+  ansible.builtin.pip:
     name: "{{ library }}"
     state: latest
     extra_args: --upgrade
@@ -62,14 +62,14 @@
     loop_var: "library"
 
 - name: "Installer : Certbot : Auth Hook - Create Folder"
-  file:
+  ansible.builtin.file:
     path: ~/data/certbot/auth-hooks
     state: directory
   tags:
     - certbot
 
 - name: "Installer : Certbot : Auth Hook - Download"
-  get_url:
+  ansible.builtin.get_url:
     url: "https://git.waren.io/warengroup/acme-dns-auth/raw/branch/master/acme-dns-auth.py"
     dest: "~/data/certbot/auth-hooks/acme-dns.py"
     mode: '700'
@@ -104,7 +104,7 @@
     - certbot
 
 - name: "Installer : Schedule : Maintenance"
-  cron:
+  ansible.builtin.cron:
     name: "Matte - Infra - Maintenance"
     hour: "*/3"
     minute: "0"
@@ -113,7 +113,7 @@
     - cron
 
 - name: "Installer : Schedule : Deployer"
-  cron:
+  ansible.builtin.cron:
     name: "Matte - Infra - Deployer"
     minute: "*/5"
     job: "~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml tasks.yml -t deployer"
@@ -121,7 +121,7 @@
     - cron
 
 - name: "Installer : Schedule : Backup"
-  cron:
+  ansible.builtin.cron:
     name: "Matte - Infra - Backup"
     hour: "5"
     minute: "0"

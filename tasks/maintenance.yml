@@ -1,6 +1,6 @@
 ---
 - name: "Installer - Ansible - Dependencies / Python Libraries"
-  pip:
+  ansible.builtin.pip:
     name: "{{ library }}"
     state: latest
     extra_args: --upgrade
@@ -20,7 +20,7 @@
     loop_var: "library"
 
 - name: "Maintenance : Ansible : Update"
-  pip:
+  ansible.builtin.pip:
     name: ansible
     state: latest
     extra_args: --upgrade
