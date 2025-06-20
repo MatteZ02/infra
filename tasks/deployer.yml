@@ -32,3 +32,58 @@
   tags:
     - certbot
     - tls
+
+# - name: "Deployer - Minecraft - Build Image"
+#   containers.podman.podman_image:
+#     name: arcadiamc/openjdk
+#     tag: latest
+#     path: "{{ ansible_facts.user_dir }}/data/minecraft"
+#     build:
+#       file: Dockerfile
+#       format: docker
+#       cache: off
+#     force: on
+#   tags:
+#     - minecraft
+
+# - name: "Deployer - Minecraft - Create Container"
+#   containers.podman.podman_container:
+#     name: minecraft
+#     image: "arcadiamc/openjdk:latest"
+#     state: started
+#     recreate: on
+#     network: host
+#     volumes:
+#       - "{{ ansible_facts.user_dir }}/data/minecraft:/usr/src/app"
+#     workdir: /usr/src/app
+#     command: "java -Xms1G -Xmx8G -jar paper-1.21.4-232.jar"
+#   restart_policy: unless-stopped
+#   tags:
+#     - minecraft
+
+# - name: "Deployer - SSH - Build Image"
+#   containers.podman.podman_image:
+#     name: matte/ssh
+#     tag: latest
+#     path: "{{ ansible_facts.user_dir }}/data/ssh"
+#     build:
+#       file: Dockerfile
+#       format: docker
+#       cache: off
+#     force: on
+#   tags:
+#     - ssh
+
+# - name: "Deployer - SSH - Create Container"
+#   containers.podman.podman_container:
+#     name: ssh
+#     image: "matte/ssh:latest"
+#     state: started
+#     recreate: on
+#     network: host
+#     volumes:
+#       - "{{ ansible_facts.user_dir }}/data:/root/data"
+#       - "{{ ansible_facts.user_dir }}/data/ssh/keys:/etc/ssh/keys"
+#     restart_policy: unless-stopped
+#   tags:
+#     - ssh

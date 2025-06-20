@@ -1,0 +1,24 @@
+Port 25590
+HostKey /etc/ssh/keys/ssh_host_rsa_key
+HostKey /etc/ssh/keys/ssh_host_ed25519_key
+SyslogFacility AUTHPRIV
+LogLevel VERBOSE
+PermitRootLogin prohibit-password
+MaxAuthTries 2
+PubkeyAuthentication yes
+AuthorizedKeysFile	.ssh/authorized_keys
+PermitEmptyPasswords no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+UsePAM yes
+AllowAgentForwarding no
+AllowTcpForwarding yes
+X11Forwarding no
+TCPKeepAlive yes
+Compression no
+ClientAliveCountMax 2
+UseDNS no
+PermitTunnel yes
+PermitOpen localhost:27017
+PrintMotd no
+Subsystem	sftp	/usr/lib/openssh/sftp-server
