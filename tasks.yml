@@ -29,11 +29,3 @@
       tags:
         - deployer
         - never
-
-    - name: "Backup"
-      import_tasks: tasks/backup.yml
-      vars:
-        ansible_python_interpreter: "{{ ansible_facts.user_dir }}/.venv/ansible/bin/python3"
-      tags:
-        - backup
-        - never
