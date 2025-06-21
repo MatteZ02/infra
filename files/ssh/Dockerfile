@@ -1,7 +1,7 @@
 FROM docker.io/library/debian:latest
 
 RUN apt update && \
-    apt install -y openssh-server rsync git python3-pip python3-venv jq git curl lsb-release nano
+    apt install -y openssh-server rsync git python3-pip python3-venv jq git curl lsb-release nano man
 
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
