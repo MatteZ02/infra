@@ -68,9 +68,9 @@
   tags:
     - certbot
 
-- name: "Installer : Certbot : Auth Hook - Download"
-  ansible.builtin.get_url:
-    url: "https://git.waren.io/warengroup/acme-dns-auth/raw/branch/master/acme-dns-auth.py"
+- name: "Installer : Certbot : Auth Hook - Copy File"
+  ansible.builtin.copy:
+    src: "./files/certbot/auth-hooks/acme-dns.py"
     dest: "~/data/certbot/auth-hooks/acme-dns.py"
     mode: '700'
     force: true
