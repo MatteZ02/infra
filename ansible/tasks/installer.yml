@@ -70,7 +70,7 @@
 
 - name: "Installer : Certbot : Auth Hook - Copy File"
   ansible.builtin.copy:
-    src: "./files/certbot/auth-hooks/acme-dns.py"
+    src: "./templates/certbot/auth-hooks/acme-dns.py"
     dest: "~/data/certbot/auth-hooks/acme-dns.py"
     mode: '700'
     force: true
