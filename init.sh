@@ -45,7 +45,7 @@ then
     echo "$PASSWORD" > ~/.ansible/vault/matte.yml
 fi
 
-~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml tasks.yml -t installer
+~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml ansible/tasks.yml -t installer
 
 echo "
 ==============================

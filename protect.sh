@@ -21,7 +21,7 @@ decrypt() {
 list() {
     echo "${underline}Listing...${nounderline}"
     i=0
-    for file in inventories/*/group_vars/* inventories/*/host_vars/*;
+    for file in ansible/inventories/*/group_vars/* ansible/inventories/*/host_vars/*;
     do
         i=$((i + 1))
         echo $i")"$file
@@ -29,7 +29,7 @@ list() {
 }
 
 execute() {
-for file in inventories/*/group_vars/* inventories/*/host_vars/*;
+for file in ansible/inventories/*/group_vars/* ansible/inventories/*/host_vars/*;
     do
         i=$((i + 1))
         echo $i")"$file
