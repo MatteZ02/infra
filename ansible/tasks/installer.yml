@@ -108,7 +108,7 @@
     name: "Matte - Infra - Maintenance"
     hour: "*/3"
     minute: "0"
-    job: "~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml tasks.yml -t maintenance"
+    job: "~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml ansible/tasks.yml -t maintenance"
   tags:
     - cron
 
@@ -116,7 +116,7 @@
   ansible.builtin.cron:
     name: "Matte - Infra - Deployer"
     minute: "*/5"
-    job: "~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml tasks.yml -t deployer"
+    job: "~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml ansible/tasks.yml -t deployer"
   tags:
     - cron
 
@@ -125,6 +125,6 @@
     name: "Matte - Infra - Backup"
     hour: "3"
     minute: "30"
-    job: "~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml tasks.yml -t backup"
+    job: "~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml ansible/tasks.yml -t backup"
   tags:
     - cron
