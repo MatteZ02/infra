@@ -30,8 +30,8 @@ then
 fi
 
 python3 -m venv ~/.venv/ansible &> /dev/null
-~/.venv/ansible/bin/pip3 install cryptography dnspython hvac jmespath netaddr pexpect &> /dev/null
-~/.venv/ansible/bin/pip3 install ansible &> /dev/null
+~/.venv/ansible/bin/pip3 install cryptography dnspython hvac jmespath netaddr pexpect --upgrade &> /dev/null
+~/.venv/ansible/bin/pip3 install ansible --upgrade &> /dev/null
 
 ~/.venv/ansible/bin/ansible-galaxy collection install community.general containers.podman --upgrade &> /dev/null
 
@@ -45,7 +45,7 @@ then
     echo "$PASSWORD" > ~/.ansible/vault/matte.yml
 fi
 
-~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml ansible/tasks.yml -t installer
+ANSIBLE_CONFIG=~/.ansible/pull/matte/infra/ansible/ansible.cfg ~/.venv/ansible/bin/ansible-pull -U ssh://git@github.com/MatteZ02/infra -d ~/.ansible/pull/matte/infra --accept-host-key --private-key ~/.ssh/keys/matte/infra --vault-password-file ~/.ansible/vault/matte.yml --inventory ansible/inventories/matte ansible/tasks.yml -t installer
 
 echo "
 ==============================
